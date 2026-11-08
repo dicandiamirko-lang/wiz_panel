@@ -44,13 +44,13 @@ jobs:
     name: Scansione IaC (Checkov)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       # soft_fail: le misconfigurazioni sono VOLUTE dall'esercizio, quindi la
       # pipeline le rileva e le pubblica senza bloccare. In un contesto reale
       # si imposta soft_fail: false per bloccare il deploy.
       - name: Checkov
-        uses: bridgecrewio/checkov-action@v12
+        uses: bridgecrewio/checkov-action@45edc9d8856b664db2ec251f5f8632361f0a67aa # v12
         with:
           directory: terraform
           framework: terraform
@@ -60,7 +60,7 @@ jobs:
 
       - name: Upload risultati in GitHub Security
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@9418214df1f2c4b8128c770156c409013b07d6b9 # v3
         with:
           sarif_file: checkov.sarif
           category: checkov-iac
@@ -74,19 +74,27 @@ jobs:
       run:
         working-directory: ${{ env.WORKDIR }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: google-github-actions/auth@v2
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_IAC_SA }}
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2
+
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
 
       - run: terraform fmt -check -recursive
       - run: terraform init -input=false -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
       - run: terraform validate
       - run: terraform plan -input=false -out=tfplan
+
+      # Il piano contiene i valori dei segreti: va nel bucket privato dello
+      # state, non negli artifact di GitHub (scaricabili su un repo pubblico).
+      - name: Salva il piano nel bucket privato
+        if: github.event_name != 'pull_request'
+        run: gcloud storage cp tfplan "gs://${{ vars.TF_STATE_BUCKET }}/plans/${{ github.run_id }}/tfplan"
 
   apply:
     name: Terraform apply
@@ -98,17 +106,26 @@ jobs:
       run:
         working-directory: ${{ env.WORKDIR }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: google-github-actions/auth@v2
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_IAC_SA }}
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2
+
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
 
       - run: terraform init -input=false -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
-      - run: terraform apply -input=false -auto-approve
+
+      # Applica esattamente il piano generato (e approvato) in questo run
+      - name: Recupera il piano
+        run: gcloud storage cp "gs://${{ vars.TF_STATE_BUCKET }}/plans/${{ github.run_id }}/tfplan" tfplan
+      - run: terraform apply -input=false tfplan
+      - name: Cancella il piano dal bucket
+        if: always()
+        run: gcloud storage rm "gs://${{ vars.TF_STATE_BUCKET }}/plans/${{ github.run_id }}/tfplan"
       - run: terraform output
 
   destroy:
@@ -121,14 +138,37 @@ jobs:
       run:
         working-directory: ${{ env.WORKDIR }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: google-github-actions/auth@v2
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_IAC_SA }}
 
-      - uses: hashicorp/setup-terraform@v3
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2
+
+      - id: gke
+        continue-on-error: true # il cluster potrebbe non esistere piu'
+        uses: google-github-actions/get-gke-credentials@64bc7249bbcf78056bb92f14d3cedc2da193946c # v2
+        with:
+          cluster_name: wiz-gke
+          location: ${{ vars.GCP_ZONE }}
+
+      # Load balancer e NEG li crea Kubernetes, non Terraform: se restano,
+      # la VPC risulta in uso e il destroy fallisce (e continuano i costi).
+      - name: Rimuovi le risorse create da Kubernetes
+        if: steps.gke.outcome == 'success'
+        run: |
+          kubectl delete namespace tasky --ignore-not-found --timeout=600s
+          for i in $(seq 1 30); do
+            negs=$(gcloud compute network-endpoint-groups list --filter="network~wiz-vpc" --format="value(name)")
+            [ -z "$negs" ] && exit 0
+            echo "In attesa della rimozione dei NEG: $negs"
+            sleep 20
+          done
+          echo "::warning::NEG ancora presenti dopo 10 minuti"
+
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
 
       - run: terraform init -input=false -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
       - run: terraform destroy -input=false -auto-approve

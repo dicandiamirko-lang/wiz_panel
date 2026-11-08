@@ -10,6 +10,6 @@ variable "region" {
 }
 
 variable "github_repo" {
-  description = "Repository GitHub nel formato owner/nome (es. mirko/wiz-exercise)"
+  description = "Repository GitHub nel formato owner/nome"
   type        = string
 }
