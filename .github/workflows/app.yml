@@ -51,7 +51,7 @@ jobs:
           docker run --rm --entrypoint cat "${{ steps.meta.outputs.image }}" /app/wizexercise.txt
 
       - name: Scan immagine (Trivy) - report SARIF
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ steps.meta.outputs.image }}
           format: sarif
@@ -71,7 +71,7 @@ jobs:
       # usa dipendenze Go datate: decidere in base al risultato della prima run).
       - name: Gate vulnerabilita' critiche
         if: vars.TRIVY_GATE != 'false'
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ steps.meta.outputs.image }}
           format: table
