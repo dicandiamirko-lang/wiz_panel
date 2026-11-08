@@ -1,0 +1,134 @@
+# =============================================================================
+# Pipeline 1 - Infrastructure as Code (Terraform)
+#   PR      : scansione IaC (Checkov) + fmt/validate + plan
+#   main    : scansione + plan + apply (dietro approvazione dell'environment)
+#   manuale : apply o destroy
+# Autenticazione a GCP via Workload Identity Federation (OIDC): nessuna chiave.
+# =============================================================================
+name: IaC - Terraform
+
+on:
+  pull_request:
+    paths: ["terraform/**", ".github/workflows/iac.yml"]
+  push:
+    branches: [main]
+    paths: ["terraform/**", ".github/workflows/iac.yml"]
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "apply o destroy"
+        type: choice
+        options: [apply, destroy]
+        default: apply
+
+permissions:
+  contents: read
+  id-token: write        # necessario per l'OIDC verso GCP
+  security-events: write # upload SARIF nella tab Security
+
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
+env:
+  TF_IN_AUTOMATION: "true"
+  TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID }}
+  TF_VAR_region: ${{ vars.GCP_REGION }}
+  TF_VAR_zone: ${{ vars.GCP_ZONE }}
+  TF_VAR_alert_email: ${{ vars.ALERT_EMAIL }}
+  TF_VAR_enable_org_policies: ${{ vars.ENABLE_ORG_POLICIES || 'false' }}
+  WORKDIR: terraform
+
+jobs:
+  iac-scan:
+    name: Scansione IaC (Checkov)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # soft_fail: le misconfigurazioni sono VOLUTE dall'esercizio, quindi la
+      # pipeline le rileva e le pubblica senza bloccare. In un contesto reale
+      # si imposta soft_fail: false per bloccare il deploy.
+      - name: Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: terraform
+          framework: terraform
+          soft_fail: true
+          output_format: cli,sarif
+          output_file_path: console,checkov.sarif
+
+      - name: Upload risultati in GitHub Security
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: checkov.sarif
+          category: checkov-iac
+
+  plan:
+    name: Terraform plan
+    needs: iac-scan
+    if: github.event_name != 'workflow_dispatch' || inputs.action == 'apply'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKDIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_IAC_SA }}
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - run: terraform fmt -check -recursive
+      - run: terraform init -input=false -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+      - run: terraform validate
+      - run: terraform plan -input=false -out=tfplan
+
+  apply:
+    name: Terraform apply
+    needs: plan
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.action == 'apply')
+    runs-on: ubuntu-latest
+    environment: production # configura i "required reviewers" per l'approvazione manuale
+    defaults:
+      run:
+        working-directory: ${{ env.WORKDIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_IAC_SA }}
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - run: terraform init -input=false -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+      - run: terraform apply -input=false -auto-approve
+      - run: terraform output
+
+  destroy:
+    name: Terraform destroy
+    needs: iac-scan
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'destroy'
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: ${{ env.WORKDIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_IAC_SA }}
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - run: terraform init -input=false -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+      - run: terraform destroy -input=false -auto-approve

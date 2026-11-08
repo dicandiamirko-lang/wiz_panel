@@ -1,0 +1,20 @@
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+crash.log
+terraform.tfvars
+.terraform.lock.hcl.bak
+
+# Segreti locali
+.env
+*.json.key
+*-key.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,8 @@
+# Copia in terraform.tfvars per l'uso locale (la pipeline passa le variabili via -var)
+project_id  = "wiz-cloudlabs-xxxxxx"
+region      = "europe-west1"
+zone        = "europe-west1-b"
+alert_email = ""
+
+# Metti true solo se l'account CloudLabs ha roles/orgpolicy.policyAdmin
+enable_org_policies = false
