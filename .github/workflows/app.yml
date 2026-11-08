@@ -24,6 +24,7 @@ env:
   ZONE: ${{ vars.GCP_ZONE }}
   CLUSTER: wiz-gke
   IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/wiz-apps/tasky
+  LOCAL_IMAGE: tasky:ci
 
 jobs:
   build:
@@ -32,28 +33,29 @@ jobs:
     outputs:
       image: ${{ steps.meta.outputs.image }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - id: meta
         run: echo "image=${IMAGE}:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
 
       - name: Lint Dockerfile (Hadolint)
-        uses: hadolint/hadolint-action@v3.1.0
+        uses: hadolint/hadolint-action@54c9adbab1582c2ef04b2016b760714a4bfde3cf # v3.1.0
         with:
           dockerfile: app/Dockerfile
           failure-threshold: error
 
+      # Tag locale: build e scansioni non dipendono dalla configurazione GCP
       - name: Build immagine
-        run: docker build -t "${{ steps.meta.outputs.image }}" app
+        run: docker build -t "$LOCAL_IMAGE" app
 
       - name: Verifica wizexercise.txt nell'immagine
         run: |
-          docker run --rm --entrypoint cat "${{ steps.meta.outputs.image }}" /app/wizexercise.txt
+          docker run --rm --entrypoint cat "$LOCAL_IMAGE" /app/wizexercise.txt
 
       - name: Scan immagine (Trivy) - report SARIF
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          image-ref: ${{ steps.meta.outputs.image }}
+          image-ref: ${{ env.LOCAL_IMAGE }}
           format: sarif
           output: trivy.sarif
           severity: CRITICAL,HIGH
@@ -61,7 +63,7 @@ jobs:
 
       - name: Upload risultati in GitHub Security
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@9418214df1f2c4b8128c770156c409013b07d6b9 # v3
         with:
           sarif_file: trivy.sarif
           category: trivy-image
@@ -71,9 +73,9 @@ jobs:
       # usa dipendenze Go datate: decidere in base al risultato della prima run).
       - name: Gate vulnerabilita' critiche
         if: vars.TRIVY_GATE != 'false'
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          image-ref: ${{ steps.meta.outputs.image }}
+          image-ref: ${{ env.LOCAL_IMAGE }}
           format: table
           severity: CRITICAL
           ignore-unfixed: true
@@ -81,7 +83,7 @@ jobs:
 
       - name: Auth GCP
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_APP_SA }}
@@ -90,6 +92,7 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
           gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+          docker tag "$LOCAL_IMAGE" "${{ steps.meta.outputs.image }}"
           docker push "${{ steps.meta.outputs.image }}"
 
   deploy:
@@ -99,16 +102,16 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: google-github-actions/auth@v2
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_APP_SA }}
 
-      - uses: google-github-actions/setup-gcloud@v2
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2
 
-      - uses: google-github-actions/get-gke-credentials@v2
+      - uses: google-github-actions/get-gke-credentials@64bc7249bbcf78056bb92f14d3cedc2da193946c # v2
         with:
           cluster_name: ${{ env.CLUSTER }}
           location: ${{ env.ZONE }}

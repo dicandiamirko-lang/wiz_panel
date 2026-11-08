@@ -132,10 +132,17 @@ git push -u origin main
 ### 5. Teardown
 *Actions → IaC - Terraform → Run workflow → destroy*, poi in locale `terraform destroy` in `bootstrap/`.
 
+La pipeline cancella prima il namespace `tasky`, perché il load balancer e i NEG sono creati da Kubernetes e Terraform non li conosce. Se lanci `terraform destroy` a mano, esegui prima:
+```bash
+kubectl delete namespace tasky
+```
+Controlla infine in console che non siano rimaste risorse a pagamento.
+
 ---
 
 ## Problemi noti / da verificare alla prima esecuzione
 - **Chiave GPG di MongoDB 6.0**: se `apt` rifiuta la chiave scaduta, guarda `/var/log/wiz-mongo-setup.log` sulla VM. In alternativa usa `mongo_version = "7.0"`: è comunque più vecchia di un anno rispetto all'8.x.
 - **Org Policy**: lascia `ENABLE_ORG_POLICIES=false` se l'account CloudLabs non ha `orgpolicy.policyAdmin`.
 - **Gate Trivy**: le dipendenze Go di Tasky sono del 2022; se il gate blocca, decidi se aggiornare `go.mod` (bonus da raccontare) o impostare `TRIVY_GATE=false`.
-- **Checkov** è in `soft_fail`: segnala le debolezze volute senza bloccare.
+- **Checkov** è in `soft_fail`: segnala le debolezze volute senza bloccare. In un contesto reale andrebbe impostato `soft_fail: false`.
+- **State e piani Terraform** contengono le password generate: stanno solo nel bucket privato dello state, con accesso limitato ai service account e agli owner del progetto.

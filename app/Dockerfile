@@ -21,4 +21,7 @@ COPY wizexercise.txt /app/wizexercise.txt
 
 ENV GIN_MODE=release
 EXPOSE 8080
+
+# Il container non gira come root
+USER 65532:65532
 ENTRYPOINT ["/app/tasky"]
