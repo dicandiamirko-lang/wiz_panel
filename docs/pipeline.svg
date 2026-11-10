@@ -1,15 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Segoe UI, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1063" width="1600" height="1063" font-family="Segoe UI, Arial, sans-serif">
   <defs>
     <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#5F6368"/>
     </marker>
   </defs>
 
-  <rect width="1600" height="900" fill="#FFFFFF"/>
+  <rect width="1600" height="1063" fill="#FFFFFF"/>
 
   <text x="30" y="44" font-size="26" font-weight="700" fill="#202124">Pipeline CI/CD e controlli di sicurezza</text>
-  <text x="30" y="70" font-size="14" fill="#5F6368">GitHub Actions · tre workflow · autenticazione a GCP via OIDC (Workload Identity Federation), nessuna chiave salvata</text>
+  <text x="30" y="70" font-size="14" fill="#5F6368">GitHub Actions · quattro workflow · autenticazione a GCP via OIDC (Workload Identity Federation), nessuna chiave salvata</text>
 
+  <!-- ============ CORSIA 0: PIPELINE SECURITY ============ -->
+  <rect x="30" y="95" width="1280" height="145" rx="10" fill="#F8F9FA" stroke="#DADCE0"/>
+  <text x="48" y="121" font-size="17" font-weight="700" fill="#202124">Pipeline Security</text>
+  <rect x="215" y="106" width="250" height="22" rx="11" fill="#E8F0FE"/>
+  <text x="340" y="121" font-size="11.5" font-weight="600" fill="#1967D2" text-anchor="middle">ogni modifica in .github/ · lunedì</text>
+
+  <rect x="60" y="140" width="150" height="80" rx="8" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="135" y="165" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">actionlint</text>
+  <text x="135" y="184" font-size="12" fill="#3C4043" text-anchor="middle">sintassi e script</text>
+  <text x="135" y="204" font-size="11" fill="#5F6368" text-anchor="middle">blocca sugli errori</text>
+
+  <rect x="238" y="140" width="150" height="80" rx="8" fill="#FEF7E0" stroke="#B06000" stroke-dasharray="5 3" stroke-width="1.4"/>
+  <text x="313" y="165" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">zizmor · report</text>
+  <text x="313" y="184" font-size="12" fill="#3C4043" text-anchor="middle">injection · permessi</text>
+  <text x="313" y="204" font-size="11" fill="#5F6368" text-anchor="middle">segnala → SARIF</text>
+
+  <rect x="416" y="140" width="150" height="80" rx="8" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="491" y="165" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">zizmor · gate</text>
+  <text x="491" y="184" font-size="12" fill="#3C4043" text-anchor="middle">gravità alta</text>
+  <text x="491" y="204" font-size="11" fill="#5F6368" text-anchor="middle">blocca il merge *</text>
+
+  <rect x="594" y="140" width="150" height="80" rx="8" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="669" y="165" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Versioni action</text>
+  <text x="669" y="184" font-size="12" fill="#3C4043" text-anchor="middle">SHA · runtime Node</text>
+  <text x="669" y="204" font-size="11" fill="#5F6368" text-anchor="middle">blocca se deprecate *</text>
+
+  <rect x="772" y="140" width="150" height="80" rx="8" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="847" y="165" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Segreti nei YAML</text>
+  <text x="847" y="184" font-size="12" fill="#3C4043" text-anchor="middle">TruffleHog su .github</text>
+  <text x="847" y="204" font-size="11" fill="#5F6368" text-anchor="middle">blocca il merge *</text>
+
+  <text x="934" y="186" font-size="11" fill="#5F6368">in parallelo</text>
+
+  <g transform="translate(0,163)">
   <!-- ============ CORSIA A: REPO SECURITY ============ -->
   <rect x="30" y="95" width="1280" height="145" rx="10" fill="#F8F9FA" stroke="#DADCE0"/>
   <text x="48" y="121" font-size="17" font-weight="700" fill="#202124">Repo Security</text>
@@ -193,7 +227,7 @@
   <rect x="1350" y="140" width="220" height="80" rx="8" fill="#E8F0FE" stroke="#1A73E8" stroke-width="1.4"/>
   <text x="1460" y="165" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Tab Security GitHub</text>
   <text x="1460" y="184" font-size="12" fill="#3C4043" text-anchor="middle">risultati SARIF di</text>
-  <text x="1460" y="202" font-size="12" fill="#3C4043" text-anchor="middle">CodeQL · Checkov · Trivy</text>
+  <text x="1460" y="202" font-size="12" fill="#3C4043" text-anchor="middle">CodeQL · Checkov · Trivy · zizmor</text>
 
   <rect x="1350" y="305" width="220" height="80" rx="8" fill="#E8F0FE" stroke="#1A73E8" stroke-width="1.4"/>
   <text x="1460" y="330" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Infrastruttura GCP</text>
@@ -221,5 +255,6 @@
   <text x="796" y="836" font-size="13" fill="#3C4043">Step della pipeline</text>
   <line x1="960" y1="831" x2="1000" y2="831" stroke="#7B1FA2" stroke-width="2" stroke-dasharray="6 4"/>
   <text x="1008" y="836" font-size="13" fill="#3C4043">Sulle PR la pipeline si ferma qui (nessuna modifica)</text>
-  <text x="30" y="872" font-size="12" fill="#5F6368">* CodeQL, Gitleaks e TruffleHog girano in un workflow separato: bloccano il merge solo se la branch protection su main richiede i loro check.</text>
+  <text x="30" y="872" font-size="12" fill="#5F6368">* Pipeline Security e Repo Security sono workflow separati: bloccano il merge solo se la branch protection su main richiede i loro check.</text>
+  </g>
 </svg>

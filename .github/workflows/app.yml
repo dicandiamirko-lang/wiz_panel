@@ -14,10 +14,7 @@ on:
     paths: ["app/**", "k8s/**", ".github/workflows/app.yml"]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  id-token: write
-  security-events: write
+permissions: {} # nessun permesso di default: ogni job dichiara i suoi
 
 env:
   PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
@@ -31,16 +28,22 @@ jobs:
   build:
     name: Build, scan & push
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      id-token: write
     outputs:
       image: ${{ steps.meta.outputs.image }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false # il token non resta nella cartella del repo
 
       - id: meta
         run: echo "image=${IMAGE}:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
 
       - name: Lint Dockerfile (Hadolint)
-        uses: hadolint/hadolint-action@54c9adbab1582c2ef04b2016b760714a4bfde3cf # v3.1.0
+        uses: hadolint/hadolint-action@06be81baf89a55ffd0e24b8f04a4185738dd3387 # v3.5.0
         with:
           dockerfile: app/Dockerfile
           failure-threshold: error
@@ -102,35 +105,42 @@ jobs:
 
       - name: Auth GCP
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_APP_SA }}
 
       - name: Push su Artifact Registry
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        env:
+          IMAGE_REF: ${{ steps.meta.outputs.image }}
         run: |
           gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
-          docker tag "$LOCAL_IMAGE" "${{ steps.meta.outputs.image }}"
-          docker push "${{ steps.meta.outputs.image }}"
+          docker tag "$LOCAL_IMAGE" "$IMAGE_REF"
+          docker push "$IMAGE_REF"
 
   deploy:
     name: Deploy su GKE
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     environment: production
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false # il token non resta nella cartella del repo
 
-      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_APP_SA }}
 
-      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
 
-      - uses: google-github-actions/get-gke-credentials@64bc7249bbcf78056bb92f14d3cedc2da193946c # v2
+      - uses: google-github-actions/get-gke-credentials@3da1e46a907576cefaa90c484278bb5b259dd395 # v3.0.0
         with:
           cluster_name: ${{ env.CLUSTER }}
           location: ${{ env.ZONE }}
@@ -150,8 +160,10 @@ jobs:
             --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Deploy
+        env:
+          IMAGE_REF: ${{ needs.build.outputs.image }}
         run: |
-          sed "s|IMAGE_PLACEHOLDER|${{ needs.build.outputs.image }}|" k8s/02-deployment.yaml | kubectl apply -f -
+          sed "s|IMAGE_PLACEHOLDER|$IMAGE_REF|" k8s/02-deployment.yaml | kubectl apply -f -
           kubectl apply -f k8s/03-service-ingress.yaml
           kubectl rollout status deployment/tasky -n tasky --timeout=300s
 
