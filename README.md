@@ -37,8 +37,8 @@ Actions, e controlli di sicurezza nativi GCP.
 | `app/` | Applicazione Tasky (Go) + `Dockerfile` + `wizexercise.txt` |
 | `k8s/` | Namespace, RBAC (cluster-admin), Deployment, Service, Ingress |
 | `.github/workflows/iac.yml` | Pipeline 1: Checkov → plan → apply |
-| `.github/workflows/app.yml` | Pipeline 2: build → verifica file → Hadolint → Trivy → push → deploy |
-| `.github/workflows/security.yml` | CodeQL + Gitleaks |
+| `.github/workflows/app.yml` | Pipeline 2: build → verifica file → Hadolint → Trivy → ClamAV → push → deploy |
+| `.github/workflows/security.yml` | CodeQL + Gitleaks + TruffleHog |
 | `docs/demo.md` | Script della demo live |
 
 ## Debolezze intenzionali
@@ -59,7 +59,7 @@ Actions, e controlli di sicurezza nativi GCP.
 **Pipeline / repository (DevSecOps)**
 - Workload Identity Federation: nessuna chiave di service account in GitHub
 - Due service account distinti per IaC e app (separation of duties)
-- Checkov sul Terraform, Hadolint sul Dockerfile, Trivy sull'immagine, CodeQL sul codice Go, Gitleaks per i segreti, Dependabot
+- Checkov sul Terraform, Hadolint sul Dockerfile, Trivy sull'immagine (CVE), ClamAV sull'immagine (malware), CodeQL sul codice Go, Gitleaks e TruffleHog per i segreti (TruffleHog segnala solo quelli ancora attivi), Dependabot
 - Risultati pubblicati nella tab **Security** di GitHub (SARIF)
 - Environment `production` con approvazione manuale prima di apply/deploy
 - Branch protection su `main` (da configurare a mano, vedi sotto)
