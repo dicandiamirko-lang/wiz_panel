@@ -34,34 +34,39 @@
   <path d="M40,180 h260 a10,10 0 0 1 10,10 v25 h-280 v-25 a10,10 0 0 1 10,-10 z" fill="#24292F"/>
   <text x="170" y="203" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">GitHub · wiz_panel</text>
 
-  <rect x="45" y="230" width="250" height="110" rx="8" fill="#FFFFFF" stroke="#D0D7DE"/>
-  <text x="60" y="253" font-size="14" font-weight="700" fill="#202124">Repository</text>
-  <text x="60" y="276" font-size="12.5" fill="#137333">• CodeQL (analisi codice Go)</text>
-  <text x="60" y="296" font-size="12.5" fill="#137333">• Gitleaks (segreti nel codice)</text>
-  <text x="60" y="316" font-size="12.5" fill="#137333">• Dependabot · action fissate a SHA</text>
+  <rect x="45" y="228" width="250" height="150" rx="8" fill="#FFFFFF" stroke="#D0D7DE"/>
+  <text x="60" y="250" font-size="14" font-weight="700" fill="#202124">Repository e workflow</text>
+  <text x="60" y="272" font-size="12.5" fill="#137333">• CodeQL (analisi codice Go)</text>
+  <text x="60" y="292" font-size="12.5" fill="#137333">• Gitleaks + TruffleHog (segreti)</text>
+  <text x="60" y="312" font-size="12.5" fill="#137333">• actionlint + zizmor (workflow)</text>
+  <text x="60" y="332" font-size="12.5" fill="#137333">• Dependabot · action fissate a SHA</text>
+  <rect x="55" y="341" width="230" height="28" rx="5" fill="#F1F3F4" stroke="#80868B" stroke-dasharray="3 3"/>
+  <text x="170" y="359" font-size="11.5" font-weight="600" fill="#5F6368" text-anchor="middle">Gap: nessun controllo action deprecate</text>
 
-  <rect x="45" y="355" width="250" height="145" rx="8" fill="#FFFFFF" stroke="#D0D7DE"/>
-  <text x="60" y="378" font-size="14" font-weight="700" fill="#202124">Pipeline IaC (Terraform)</text>
-  <text x="60" y="401" font-size="12.5" fill="#137333">1. Checkov – scansione IaC</text>
-  <text x="60" y="423" font-size="12.5" fill="#3C4043">2. terraform plan</text>
-  <text x="60" y="445" font-size="12.5" fill="#137333">3. approvazione manuale</text>
-  <text x="60" y="467" font-size="12.5" fill="#3C4043">4. apply del piano salvato</text>
-  <text x="60" y="488" font-size="11.5" fill="#5F6368">destroy manuale con pulizia LB</text>
+  <rect x="45" y="390" width="250" height="135" rx="8" fill="#FFFFFF" stroke="#D0D7DE"/>
+  <text x="60" y="412" font-size="14" font-weight="700" fill="#202124">Pipeline IaC (Terraform)</text>
+  <text x="60" y="434" font-size="12.5" fill="#137333">1. Checkov – scansione IaC</text>
+  <text x="60" y="455" font-size="12.5" fill="#3C4043">2. terraform plan</text>
+  <text x="60" y="476" font-size="12.5" fill="#137333">3. approvazione manuale</text>
+  <text x="60" y="497" font-size="12.5" fill="#3C4043">4. apply del piano salvato</text>
+  <text x="60" y="516" font-size="11.5" fill="#5F6368">destroy manuale con pulizia LB</text>
 
-  <rect x="45" y="515" width="250" height="215" rx="8" fill="#FFFFFF" stroke="#D0D7DE"/>
-  <text x="60" y="538" font-size="14" font-weight="700" fill="#202124">Pipeline App</text>
-  <text x="60" y="562" font-size="12.5" fill="#137333">1. Hadolint – lint Dockerfile</text>
-  <text x="60" y="585" font-size="12.5" fill="#3C4043">2. build immagine</text>
-  <text x="60" y="608" font-size="12.5" fill="#3C4043">3. verifica wizexercise.txt</text>
-  <text x="60" y="631" font-size="12.5" fill="#137333">4. Trivy – blocca CVE critiche</text>
-  <text x="60" y="654" font-size="12.5" fill="#3C4043">5. push su Artifact Registry</text>
-  <text x="60" y="677" font-size="12.5" fill="#3C4043">6. Secret K8s da Secret Manager</text>
-  <text x="60" y="700" font-size="12.5" fill="#3C4043">7. kubectl apply su GKE</text>
+  <rect x="45" y="537" width="250" height="223" rx="8" fill="#FFFFFF" stroke="#D0D7DE"/>
+  <text x="60" y="559" font-size="14" font-weight="700" fill="#202124">Pipeline App</text>
+  <text x="60" y="582" font-size="12.5" fill="#137333">1. Hadolint – lint Dockerfile</text>
+  <text x="60" y="603" font-size="12.5" fill="#3C4043">2. build immagine</text>
+  <text x="60" y="624" font-size="12.5" fill="#3C4043">3. verifica wizexercise.txt</text>
+  <text x="60" y="645" font-size="12.5" fill="#137333">4. Trivy – blocca CVE critiche</text>
+  <text x="60" y="666" font-size="12.5" fill="#137333">5. ClamAV – blocca malware</text>
+  <text x="60" y="687" font-size="12.5" fill="#3C4043">6. push su Artifact Registry</text>
+  <text x="60" y="708" font-size="12.5" fill="#3C4043">7. Secret K8s da Secret Manager</text>
+  <text x="60" y="729" font-size="12.5" fill="#3C4043">8. kubectl apply su GKE</text>
+  <text x="60" y="749" font-size="11.5" fill="#5F6368">CI/CD autenticata a GCP via OIDC</text>
 
-  <rect x="45" y="745" width="250" height="95" rx="8" fill="#E6F4EA" stroke="#137333"/>
-  <text x="60" y="770" font-size="14" font-weight="700" fill="#137333">Environment "production"</text>
-  <text x="60" y="793" font-size="12.5" fill="#3C4043">approvazione manuale prima</text>
-  <text x="60" y="812" font-size="12.5" fill="#3C4043">di apply e deploy</text>
+  <rect x="45" y="772" width="250" height="76" rx="8" fill="#E6F4EA" stroke="#137333"/>
+  <text x="60" y="795" font-size="14" font-weight="700" fill="#137333">Environment "production"</text>
+  <text x="60" y="816" font-size="12.5" fill="#3C4043">approvazione manuale prima</text>
+  <text x="60" y="835" font-size="12.5" fill="#3C4043">di apply e deploy</text>
 
   <!-- ================= GCP ================= -->
   <rect x="400" y="180" width="1170" height="680" rx="12" fill="#F8FAFF" stroke="#1A73E8" stroke-width="2"/>
@@ -212,4 +217,6 @@
   <text x="1010" y="885" font-size="13" fill="#3C4043">Esposizione verso internet</text>
   <line x1="1200" y1="880" x2="1240" y2="880" stroke="#5F6368" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
   <text x="1250" y="885" font-size="13" fill="#3C4043">Pull immagine</text>
+  <rect x="1365" y="872" width="16" height="16" rx="3" fill="#F1F3F4" stroke="#80868B" stroke-dasharray="3 3"/>
+  <text x="1389" y="885" font-size="13" fill="#3C4043">Gap noto</text>
 </svg>
