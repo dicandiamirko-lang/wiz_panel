@@ -1,7 +1,8 @@
 # =============================================================================
 # Controlli di sicurezza sul repository
-#   - CodeQL  : SAST sul codice Go
-#   - Gitleaks: ricerca di segreti committati per errore
+#   - CodeQL    : SAST sul codice Go
+#   - Gitleaks  : ricerca di segreti committati per errore
+#   - TruffleHog: segreti ancora attivi (verificati contro il servizio)
 # =============================================================================
 name: Repo Security
 
@@ -11,6 +12,7 @@ on:
     branches: [main]
   schedule:
     - cron: "0 6 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -40,3 +42,19 @@ jobs:
       - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # TruffleHog prova i segreti trovati contro il servizio (es. API di GitHub o
+  # GCP) e fallisce solo se la credenziale e' ANCORA ATTIVA: pochi falsi positivi.
+  # Push/PR: scansiona i commit nuovi. Schedule/manuale: tutta la storia.
+  # I risultati compaiono come annotazioni nel riepilogo della run di Actions.
+  trufflehog:
+    name: Segreti attivi (TruffleHog)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: trufflesecurity/trufflehog@ea68ca03c865c5f324e86e849ced20ed3cf9dbbb # v3.99.8
+        with:
+          version: 3.99.8
+          extra_args: --results=verified

@@ -1,6 +1,7 @@
 # =============================================================================
 # Pipeline 2 - Applicazione
 #   build immagine -> verifica wizexercise.txt -> lint Dockerfile -> scan Trivy
+#   -> scan malware ClamAV
 #   -> push su Artifact Registry -> deploy su GKE
 # =============================================================================
 name: App - Build & Deploy
@@ -80,6 +81,24 @@ jobs:
           severity: CRITICAL
           ignore-unfixed: true
           exit-code: "1"
+
+      # Antivirus sui file dell'immagine: Trivy cerca CVE, ClamAV cerca malware
+      # noto (binari trojan, webshell, miner). Il filesystem dell'immagine viene
+      # estratto e scansionato da un container ClamAV, che aggiorna le firme
+      # all'avvio. Exit code di clamscan: 0 pulito, 1 malware trovato, 2 errore.
+      - name: Scan malware (ClamAV)
+        run: |
+          mkdir -p rootfs
+          cid=$(docker create "$LOCAL_IMAGE")
+          docker export "$cid" | sudo tar -x -C rootfs --exclude='dev/*'
+          docker rm "$cid" > /dev/null
+          set +e # serve per leggere l'exit code e scrivere comunque il riepilogo
+          docker run --rm -v "$PWD/rootfs:/scandir:ro" clamav/clamav:stable \
+            sh -c 'freshclam --quiet || true; clamscan -r -i --max-filesize=200M --max-scansize=500M /scandir' \
+            | tee clamav.log
+          rc=${PIPESTATUS[0]}
+          { echo '### ClamAV'; echo '```'; tail -n 12 clamav.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit "$rc"
 
       - name: Auth GCP
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
