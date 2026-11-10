@@ -39,6 +39,8 @@ Actions, e controlli di sicurezza nativi GCP.
 | `.github/workflows/iac.yml` | Pipeline 1: Checkov → plan → apply |
 | `.github/workflows/app.yml` | Pipeline 2: build → verifica file → Hadolint → Trivy → ClamAV → push → deploy |
 | `.github/workflows/security.yml` | CodeQL + Gitleaks + TruffleHog |
+| `.github/workflows/pipeline-security.yml` | Controlli sui workflow: actionlint, zizmor, versioni delle action, segreti nei YAML |
+| `.github/scripts/check-actions.sh` | Verifica che ogni action sia fissata a uno SHA, mantenuta e con runtime Node non deprecato |
 | `docs/demo.md` | Script della demo live |
 
 ## Debolezze intenzionali
@@ -60,6 +62,8 @@ Actions, e controlli di sicurezza nativi GCP.
 - Workload Identity Federation: nessuna chiave di service account in GitHub
 - Due service account distinti per IaC e app (separation of duties)
 - Checkov sul Terraform, Hadolint sul Dockerfile, Trivy sull'immagine (CVE), ClamAV sull'immagine (malware), CodeQL sul codice Go, Gitleaks e TruffleHog per i segreti (TruffleHog segnala solo quelli ancora attivi), Dependabot
+- **Pipeline security** (a ogni modifica in `.github/` e ogni lunedì): actionlint (sintassi e shellcheck), zizmor (injection, permessi eccessivi, token esposti), action fissate a SHA e con runtime Node non deprecato, TruffleHog sui file dei workflow
+- Workflow irrobustiti: permessi minimi dichiarati per job (`permissions: {}` di default), `persist-credentials: false` sui checkout, nessuna espressione `${{ }}` dentro i blocchi `run`
 - Risultati pubblicati nella tab **Security** di GitHub (SARIF)
 - Environment `production` con approvazione manuale prima di apply/deploy
 - Branch protection su `main` (da configurare a mano, vedi sotto)

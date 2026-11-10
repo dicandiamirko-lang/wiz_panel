@@ -1,0 +1,94 @@
+# =============================================================================
+# Pipeline security: controlli sui workflow di GitHub Actions
+#   - actionlint : sintassi dei workflow ed errori negli script (shellcheck)
+#   - zizmor     : misconfigurazioni di sicurezza (injection, permessi
+#                  eccessivi, token esposti, action vulnerabili o non fissate)
+#   - versioni   : action fissate a SHA, non archiviate, runtime non deprecato
+#   - segreti    : nessuna credenziale scritta nei file dentro .github/
+# Parte a ogni modifica in .github/, e ogni lunedi' perche' un'action puo'
+# diventare deprecata o vulnerabile anche senza modifiche al repository.
+# =============================================================================
+name: Pipeline Security
+
+on:
+  pull_request:
+    paths: [".github/**"]
+  push:
+    branches: [main]
+    paths: [".github/**"]
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions: {} # nessun permesso di default: ogni job dichiara i suoi
+
+jobs:
+  actionlint:
+    name: Sintassi dei workflow (actionlint)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false # il token non resta nella cartella del repo
+      # L'immagine include shellcheck, che controlla gli script nei blocchi run
+      - name: actionlint
+        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.12 -color
+
+  zizmor:
+    name: Sicurezza dei workflow (zizmor)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # upload SARIF nella tab Security
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Report completo nella tab Security (non blocca)
+      - name: zizmor - report SARIF
+        uses: zizmorcore/zizmor-action@45d7276c9ca790aabd705e31ca99c6185c3e76dd # v0.8.1
+        with:
+          version: 1.32.0
+
+      # Gate: blocca sui finding di gravita' alta
+      - name: zizmor - gate (gravita' alta)
+        uses: zizmorcore/zizmor-action@45d7276c9ca790aabd705e31ca99c6185c3e76dd # v0.8.1
+        with:
+          version: 1.32.0
+          advanced-security: "false"
+          annotations: "true"
+          min-severity: high
+
+  action-versions:
+    name: Versioni delle action
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Verifica pinning, manutenzione e runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/check-actions.sh
+
+  workflow-secrets:
+    name: Segreti nei workflow (TruffleHog)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Qui e' piu' severo del job in Repo Security: in un workflow non deve
+      # esserci nessuna credenziale, attiva o no. I segreti vanno nei GitHub
+      # Secrets o in Secret Manager, mai scritti nel YAML.
+      - name: Scansione di .github/
+        run: |
+          docker run --rm -v "$PWD/.github:/scan:ro" ghcr.io/trufflesecurity/trufflehog:3.99.8 \
+            filesystem /scan --fail --no-update --github-actions
