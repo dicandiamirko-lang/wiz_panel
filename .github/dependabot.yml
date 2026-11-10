@@ -1,18 +1,29 @@
+# Aggiornamenti settimanali delle dipendenze. cooldown: una nuova versione viene
+# proposta solo dopo 7 giorni dal rilascio, per non adottare subito un pacchetto
+# compromesso (attacchi alla supply chain spesso scoperti nei primi giorni).
 version: 2
 updates:
   - package-ecosystem: gomod
     directory: /app
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
   - package-ecosystem: docker
     directory: /app
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
   - package-ecosystem: terraform
     directory: /terraform
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
