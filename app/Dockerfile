@@ -8,7 +8,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/tasky
 
 # ---------- Stage 2: immagine di runtime ----------
-FROM alpine:3.20
+FROM alpine:3.24
 
 WORKDIR /app
 COPY --from=build /out/tasky ./tasky

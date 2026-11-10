@@ -1,0 +1,215 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5F6368"/>
+    </marker>
+    <marker id="arrRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#C5221F"/>
+    </marker>
+    <marker id="arrBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1A73E8"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <!-- Titolo -->
+  <text x="30" y="44" font-size="26" font-weight="700" fill="#202124">Architettura — Wiz Technical Exercise su GCP</text>
+  <text x="30" y="70" font-size="14" fill="#5F6368">App a due livelli: Tasky su GKE + MongoDB su VM · deploy con Terraform e GitHub Actions</text>
+
+  <!-- Attori esterni -->
+  <rect x="70" y="95" width="200" height="50" rx="8" fill="#F1F3F4" stroke="#5F6368"/>
+  <text x="170" y="125" font-size="15" font-weight="600" fill="#202124" text-anchor="middle">Sviluppatore</text>
+
+  <rect x="455" y="90" width="185" height="55" rx="8" fill="#F1F3F4" stroke="#5F6368"/>
+  <text x="547" y="114" font-size="15" font-weight="600" fill="#202124" text-anchor="middle">Utenti</text>
+  <text x="547" y="133" font-size="12" fill="#5F6368" text-anchor="middle">browser · HTTP</text>
+
+  <rect x="1030" y="90" width="160" height="55" rx="8" fill="#FCE8E6" stroke="#C5221F"/>
+  <text x="1110" y="114" font-size="15" font-weight="600" fill="#202124" text-anchor="middle">Internet</text>
+  <text x="1110" y="133" font-size="12" fill="#5F6368" text-anchor="middle">anche attaccanti</text>
+
+  <!-- ================= GITHUB ================= -->
+  <rect x="30" y="180" width="280" height="680" rx="10" fill="#F6F8FA" stroke="#24292F" stroke-width="1.5"/>
+  <path d="M40,180 h260 a10,10 0 0 1 10,10 v25 h-280 v-25 a10,10 0 0 1 10,-10 z" fill="#24292F"/>
+  <text x="170" y="203" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">GitHub · wiz_panel</text>
+
+  <rect x="45" y="230" width="250" height="110" rx="8" fill="#FFFFFF" stroke="#D0D7DE"/>
+  <text x="60" y="253" font-size="14" font-weight="700" fill="#202124">Repository</text>
+  <text x="60" y="276" font-size="12.5" fill="#137333">• CodeQL (analisi codice Go)</text>
+  <text x="60" y="296" font-size="12.5" fill="#137333">• Gitleaks (segreti nel codice)</text>
+  <text x="60" y="316" font-size="12.5" fill="#137333">• Dependabot · action fissate a SHA</text>
+
+  <rect x="45" y="355" width="250" height="145" rx="8" fill="#FFFFFF" stroke="#D0D7DE"/>
+  <text x="60" y="378" font-size="14" font-weight="700" fill="#202124">Pipeline IaC (Terraform)</text>
+  <text x="60" y="401" font-size="12.5" fill="#137333">1. Checkov – scansione IaC</text>
+  <text x="60" y="423" font-size="12.5" fill="#3C4043">2. terraform plan</text>
+  <text x="60" y="445" font-size="12.5" fill="#137333">3. approvazione manuale</text>
+  <text x="60" y="467" font-size="12.5" fill="#3C4043">4. apply del piano salvato</text>
+  <text x="60" y="488" font-size="11.5" fill="#5F6368">destroy manuale con pulizia LB</text>
+
+  <rect x="45" y="515" width="250" height="215" rx="8" fill="#FFFFFF" stroke="#D0D7DE"/>
+  <text x="60" y="538" font-size="14" font-weight="700" fill="#202124">Pipeline App</text>
+  <text x="60" y="562" font-size="12.5" fill="#137333">1. Hadolint – lint Dockerfile</text>
+  <text x="60" y="585" font-size="12.5" fill="#3C4043">2. build immagine</text>
+  <text x="60" y="608" font-size="12.5" fill="#3C4043">3. verifica wizexercise.txt</text>
+  <text x="60" y="631" font-size="12.5" fill="#137333">4. Trivy – blocca CVE critiche</text>
+  <text x="60" y="654" font-size="12.5" fill="#3C4043">5. push su Artifact Registry</text>
+  <text x="60" y="677" font-size="12.5" fill="#3C4043">6. Secret K8s da Secret Manager</text>
+  <text x="60" y="700" font-size="12.5" fill="#3C4043">7. kubectl apply su GKE</text>
+
+  <rect x="45" y="745" width="250" height="95" rx="8" fill="#E6F4EA" stroke="#137333"/>
+  <text x="60" y="770" font-size="14" font-weight="700" fill="#137333">Environment "production"</text>
+  <text x="60" y="793" font-size="12.5" fill="#3C4043">approvazione manuale prima</text>
+  <text x="60" y="812" font-size="12.5" fill="#3C4043">di apply e deploy</text>
+
+  <!-- ================= GCP ================= -->
+  <rect x="400" y="180" width="1170" height="680" rx="12" fill="#F8FAFF" stroke="#1A73E8" stroke-width="2"/>
+  <text x="1555" y="203" font-size="15" font-weight="700" fill="#1A73E8" text-anchor="end">Google Cloud · project-wiz-001</text>
+
+  <!-- Servizi gestiti (riga alta) -->
+  <rect x="455" y="215" width="185" height="75" rx="8" fill="#FFFFFF" stroke="#1A73E8"/>
+  <text x="547" y="243" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Cloud Load Balancer</text>
+  <text x="547" y="263" font-size="12" fill="#5F6368" text-anchor="middle">IP pubblico · creato</text>
+  <text x="547" y="279" font-size="12" fill="#5F6368" text-anchor="middle">dall'Ingress</text>
+
+  <rect x="660" y="215" width="145" height="75" rx="8" fill="#FFFFFF" stroke="#1A73E8"/>
+  <text x="732" y="248" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Artifact</text>
+  <text x="732" y="266" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Registry</text>
+
+  <rect x="830" y="215" width="185" height="75" rx="8" fill="#FFFFFF" stroke="#1A73E8"/>
+  <text x="922" y="243" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Secret Manager</text>
+  <text x="922" y="263" font-size="12" fill="#5F6368" text-anchor="middle">password Mongo</text>
+  <text x="922" y="279" font-size="12" fill="#5F6368" text-anchor="middle">MONGODB_URI · JWT</text>
+
+  <!-- VPC -->
+  <rect x="420" y="320" width="790" height="520" rx="10" fill="#EEF3FD" stroke="#1A73E8" stroke-dasharray="6 4"/>
+  <text x="432" y="340" font-size="13" font-weight="700" fill="#1A73E8">VPC wiz-vpc</text>
+
+  <!-- Subnet privata -->
+  <rect x="440" y="355" width="360" height="470" rx="8" fill="#FFFFFF" stroke="#8AB4F8"/>
+  <text x="452" y="815" font-size="12" font-weight="600" fill="#1967D2">Subnet privata · 10.10.16.0/20</text>
+
+  <!-- GKE -->
+  <rect x="455" y="400" width="330" height="310" rx="8" fill="#E8F0FE" stroke="#1A73E8"/>
+  <text x="467" y="419" font-size="13" font-weight="700" fill="#1A73E8">GKE · nodi privati</text>
+
+  <rect x="470" y="435" width="210" height="50" rx="6" fill="#FFFFFF" stroke="#5F6368"/>
+  <text x="575" y="458" font-size="13.5" font-weight="600" fill="#202124" text-anchor="middle">Ingress (gce)</text>
+  <text x="575" y="475" font-size="11.5" fill="#5F6368" text-anchor="middle">namespace tasky</text>
+
+  <rect x="470" y="515" width="210" height="50" rx="6" fill="#FFFFFF" stroke="#5F6368"/>
+  <text x="575" y="538" font-size="13.5" font-weight="600" fill="#202124" text-anchor="middle">Service</text>
+  <text x="575" y="555" font-size="11.5" fill="#5F6368" text-anchor="middle">bilanciamento sui pod (NEG)</text>
+
+  <rect x="470" y="595" width="210" height="105" rx="6" fill="#FFFFFF" stroke="#5F6368"/>
+  <text x="575" y="613" font-size="13.5" font-weight="600" fill="#202124" text-anchor="middle">Deployment tasky</text>
+  <rect x="485" y="621" width="85" height="26" rx="5" fill="#E8F0FE" stroke="#1A73E8"/>
+  <text x="527" y="639" font-size="12" fill="#1967D2" text-anchor="middle">pod tasky</text>
+  <rect x="582" y="621" width="85" height="26" rx="5" fill="#E8F0FE" stroke="#1A73E8"/>
+  <text x="624" y="639" font-size="12" fill="#1967D2" text-anchor="middle">pod tasky</text>
+  <text x="575" y="664" font-size="11" fill="#5F6368" text-anchor="middle">env MONGODB_URI da Secret K8s</text>
+  <rect x="490" y="672" width="170" height="21" rx="10" fill="#FEF3C7" stroke="#B45309"/>
+  <text x="575" y="687" font-size="11.5" font-weight="600" fill="#92400E" text-anchor="middle">⚠ SA cluster-admin</text>
+
+  <rect x="470" y="735" width="210" height="50" rx="6" fill="#FFFFFF" stroke="#5F6368"/>
+  <text x="575" y="757" font-size="13.5" font-weight="600" fill="#202124" text-anchor="middle">Cloud NAT</text>
+  <text x="575" y="774" font-size="11.5" fill="#5F6368" text-anchor="middle">solo uscita verso internet</text>
+
+  <!-- Subnet pubblica -->
+  <rect x="830" y="355" width="360" height="470" rx="8" fill="#FFFFFF" stroke="#8AB4F8"/>
+  <text x="842" y="375" font-size="12" font-weight="600" fill="#1967D2">Subnet pubblica · 10.10.1.0/24</text>
+
+  <rect x="850" y="520" width="320" height="240" rx="8" fill="#FFFFFF" stroke="#202124" stroke-width="1.5"/>
+  <text x="1010" y="546" font-size="15" font-weight="700" fill="#202124" text-anchor="middle">VM wiz-mongo-vm</text>
+  <text x="866" y="572" font-size="12.5" fill="#3C4043">IP interno 10.10.1.10 + IP pubblico</text>
+  <rect x="862" y="582" width="296" height="22" rx="11" fill="#FEF3C7" stroke="#B45309"/>
+  <text x="874" y="598" font-size="12" font-weight="600" fill="#92400E">⚠ Ubuntu 22.04 (Linux obsoleto)</text>
+  <rect x="862" y="610" width="296" height="22" rx="11" fill="#FEF3C7" stroke="#B45309"/>
+  <text x="874" y="626" font-size="12" font-weight="600" fill="#92400E">⚠ MongoDB 6.0 (fuori supporto)</text>
+  <rect x="862" y="638" width="296" height="22" rx="11" fill="#FEF3C7" stroke="#B45309"/>
+  <text x="874" y="654" font-size="12" font-weight="600" fill="#92400E">⚠ SA compute.admin: può creare VM</text>
+  <rect x="862" y="666" width="296" height="22" rx="11" fill="#FEF3C7" stroke="#B45309"/>
+  <text x="874" y="682" font-size="12" font-weight="600" fill="#92400E">⚠ SSH :22 aperto a 0.0.0.0/0</text>
+  <text x="866" y="711" font-size="12.5" fill="#137333">✓ autenticazione MongoDB attiva</text>
+  <text x="866" y="731" font-size="12.5" fill="#3C4043">cron 02:00 → mongodump → bucket</text>
+
+  <!-- Colonna destra -->
+  <rect x="1240" y="330" width="310" height="110" rx="8" fill="#FFFFFF" stroke="#1A73E8"/>
+  <text x="1395" y="356" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Bucket GCS backup MongoDB</text>
+  <text x="1395" y="377" font-size="12" fill="#5F6368" text-anchor="middle">dump giornalieri · retention 30 gg</text>
+  <rect x="1265" y="390" width="260" height="34" rx="17" fill="#FEF3C7" stroke="#B45309"/>
+  <text x="1395" y="412" font-size="12.5" font-weight="600" fill="#92400E" text-anchor="middle">⚠ lettura e listing pubblici</text>
+
+  <rect x="1240" y="455" width="310" height="60" rx="8" fill="#FFFFFF" stroke="#1A73E8"/>
+  <text x="1395" y="480" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Bucket state Terraform</text>
+  <text x="1395" y="500" font-size="12" fill="#137333" text-anchor="middle">privato · versionato</text>
+
+  <rect x="1240" y="535" width="310" height="305" rx="8" fill="#E6F4EA" stroke="#137333" stroke-width="1.5"/>
+  <text x="1395" y="560" font-size="14.5" font-weight="700" fill="#137333" text-anchor="middle">Controlli di sicurezza GCP</text>
+
+  <rect x="1255" y="575" width="280" height="56" rx="6" fill="#FFFFFF" stroke="#137333"/>
+  <text x="1268" y="598" font-size="13" font-weight="700" fill="#202124">Cloud Audit Logs</text>
+  <text x="1268" y="619" font-size="11.5" fill="#3C4043">control plane GCP + K8s · log bucket 90 gg</text>
+
+  <rect x="1255" y="640" width="280" height="56" rx="6" fill="#FFFFFF" stroke="#137333"/>
+  <text x="1268" y="663" font-size="13" font-weight="700" fill="#202124">Binary Authorization</text>
+  <text x="1268" y="684" font-size="11.5" fill="#3C4043">preventivo: solo immagini del registry</text>
+
+  <rect x="1255" y="705" width="280" height="56" rx="6" fill="#FFFFFF" stroke="#137333"/>
+  <text x="1268" y="728" font-size="13" font-weight="700" fill="#202124">6 alert Cloud Monitoring</text>
+  <text x="1268" y="749" font-size="11.5" fill="#3C4043">detective: bucket pubblico, IAM, exec…</text>
+
+  <rect x="1255" y="770" width="280" height="56" rx="6" fill="#FFFFFF" stroke="#137333" stroke-dasharray="4 3"/>
+  <text x="1268" y="793" font-size="13" font-weight="700" fill="#202124">Org Policy (opzionali)</text>
+  <text x="1268" y="814" font-size="11.5" fill="#3C4043">richiedono un'organizzazione</text>
+
+  <!-- ================= FRECCE ================= -->
+  <!-- Sviluppatore -> GitHub -->
+  <line x1="170" y1="145" x2="170" y2="178" stroke="#5F6368" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="180" y="167" font-size="12" fill="#5F6368">git push</text>
+
+  <!-- GitHub -> GCP (OIDC) -->
+  <line x1="310" y1="520" x2="398" y2="520" stroke="#1A73E8" stroke-width="3.5" marker-end="url(#arrBlue)"/>
+  <text x="354" y="503" font-size="12" font-weight="700" fill="#1A73E8" text-anchor="middle">OIDC</text>
+  <text x="354" y="541" font-size="11" fill="#1A73E8" text-anchor="middle">nessuna</text>
+  <text x="354" y="555" font-size="11" fill="#1A73E8" text-anchor="middle">chiave</text>
+
+  <!-- Utenti -> LB -> Ingress -> Service -> Pod -->
+  <line x1="547" y1="145" x2="547" y2="213" stroke="#5F6368" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="610" y1="290" x2="610" y2="433" stroke="#5F6368" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="575" y1="485" x2="575" y2="513" stroke="#5F6368" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="575" y1="565" x2="575" y2="593" stroke="#5F6368" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Artifact Registry -> Pod -->
+  <path d="M732,290 V625 H682" fill="none" stroke="#5F6368" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#arr)"/>
+  <text x="740" y="500" font-size="11" fill="#5F6368">pull</text>
+  <text x="740" y="514" font-size="11" fill="#5F6368">immagine</text>
+
+  <!-- Pod -> MongoDB -->
+  <line x1="680" y1="680" x2="848" y2="680" stroke="#5F6368" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="688" y="690" width="140" height="34" rx="4" fill="#FFFFFF" stroke="#DADCE0"/>
+  <text x="758" y="704" font-size="11" font-weight="600" fill="#202124" text-anchor="middle">TCP 27017</text>
+  <text x="758" y="718" font-size="11" fill="#137333" text-anchor="middle">firewall: solo da GKE</text>
+
+  <!-- Internet -> SSH VM -->
+  <line x1="1110" y1="145" x2="1110" y2="518" stroke="#C5221F" stroke-width="2" marker-end="url(#arrRed)"/>
+  <text x="1100" y="470" font-size="12" font-weight="600" fill="#C5221F" text-anchor="end">SSH :22 da 0.0.0.0/0</text>
+
+  <!-- Internet -> bucket pubblico -->
+  <path d="M1190,117 H1395 V328" fill="none" stroke="#C5221F" stroke-width="2" marker-end="url(#arrRed)"/>
+  <text x="1205" y="108" font-size="12" font-weight="600" fill="#C5221F">download dei backup senza login</text>
+
+  <!-- VM -> bucket backup -->
+  <path d="M1170,600 H1222 V385 H1238" fill="none" stroke="#5F6368" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Legenda -->
+  <rect x="400" y="872" width="16" height="16" rx="3" fill="#FEF3C7" stroke="#B45309"/>
+  <text x="424" y="885" font-size="13" fill="#3C4043">Debolezza intenzionale richiesta dall'esercizio</text>
+  <rect x="760" y="872" width="16" height="16" rx="3" fill="#E6F4EA" stroke="#137333"/>
+  <text x="784" y="885" font-size="13" fill="#3C4043">Controllo di sicurezza</text>
+  <line x1="960" y1="880" x2="1000" y2="880" stroke="#C5221F" stroke-width="2" marker-end="url(#arrRed)"/>
+  <text x="1010" y="885" font-size="13" fill="#3C4043">Esposizione verso internet</text>
+  <line x1="1200" y1="880" x2="1240" y2="880" stroke="#5F6368" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
+  <text x="1250" y="885" font-size="13" fill="#3C4043">Pull immagine</text>
+</svg>

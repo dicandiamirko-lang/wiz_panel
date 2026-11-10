@@ -1,0 +1,213 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5F6368"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="30" y="44" font-size="26" font-weight="700" fill="#202124">Pipeline CI/CD e controlli di sicurezza</text>
+  <text x="30" y="70" font-size="14" fill="#5F6368">GitHub Actions · tre workflow · autenticazione a GCP via OIDC (Workload Identity Federation), nessuna chiave salvata</text>
+
+  <!-- ============ CORSIA A: REPO SECURITY ============ -->
+  <rect x="30" y="95" width="1280" height="145" rx="10" fill="#F8F9FA" stroke="#DADCE0"/>
+  <text x="48" y="121" font-size="17" font-weight="700" fill="#202124">Repo Security</text>
+  <rect x="200" y="106" width="210" height="22" rx="11" fill="#E8F0FE"/>
+  <text x="305" y="121" font-size="11.5" font-weight="600" fill="#1967D2" text-anchor="middle">PR · push su main · lunedì</text>
+
+  <rect x="60" y="140" width="150" height="80" rx="8" fill="#FEF7E0" stroke="#B06000" stroke-dasharray="5 3" stroke-width="1.4"/>
+  <text x="135" y="165" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">CodeQL</text>
+  <text x="135" y="184" font-size="12" fill="#3C4043" text-anchor="middle">SAST sul codice Go</text>
+  <text x="135" y="204" font-size="11" fill="#5F6368" text-anchor="middle">segnala → SARIF</text>
+
+  <rect x="238" y="140" width="150" height="80" rx="8" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="313" y="165" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Gitleaks</text>
+  <text x="313" y="184" font-size="12" fill="#3C4043" text-anchor="middle">segreti nella cronologia</text>
+  <text x="313" y="204" font-size="11" fill="#5F6368" text-anchor="middle">blocca il merge *</text>
+
+  <text x="400" y="186" font-size="11" fill="#5F6368">in parallelo</text>
+
+  <rect x="772" y="140" width="506" height="80" rx="8" fill="#FEF7E0" stroke="#B06000" stroke-dasharray="5 3" stroke-width="1.4"/>
+  <text x="1025" y="165" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Dependabot · SCA sulle dipendenze dichiarate</text>
+  <text x="1025" y="185" font-size="12" fill="#3C4043" text-anchor="middle">go.mod · FROM del Dockerfile · versioni delle action · provider Terraform</text>
+  <text x="1025" y="205" font-size="11" fill="#5F6368" text-anchor="middle">ogni settimana apre PR di aggiornamento</text>
+
+  <!-- ============ CORSIA B: IaC ============ -->
+  <rect x="30" y="258" width="1280" height="195" rx="10" fill="#F8F9FA" stroke="#DADCE0"/>
+  <text x="48" y="284" font-size="17" font-weight="700" fill="#202124">Pipeline IaC · Terraform</text>
+  <rect x="262" y="269" width="250" height="22" rx="11" fill="#E8F0FE"/>
+  <text x="387" y="284" font-size="11.5" font-weight="600" fill="#1967D2" text-anchor="middle">PR · push su main (terraform/**)</text>
+
+  <rect x="60" y="305" width="150" height="80" rx="8" fill="#FEF7E0" stroke="#B06000" stroke-dasharray="5 3" stroke-width="1.4"/>
+  <text x="135" y="330" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Checkov</text>
+  <text x="135" y="349" font-size="12" fill="#3C4043" text-anchor="middle">scansione IaC</text>
+  <text x="135" y="369" font-size="11" fill="#5F6368" text-anchor="middle">soft fail → SARIF</text>
+
+  <rect x="238" y="305" width="150" height="80" rx="8" fill="#E6F4EA" stroke="#137333" stroke-width="1.4"/>
+  <text x="313" y="330" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Login OIDC</text>
+  <text x="313" y="349" font-size="12" fill="#3C4043" text-anchor="middle">gh-iac-deployer</text>
+  <text x="313" y="369" font-size="11" fill="#5F6368" text-anchor="middle">token valido 1 ora</text>
+
+  <rect x="416" y="305" width="150" height="80" rx="8" fill="#FFFFFF" stroke="#9AA0A6"/>
+  <text x="491" y="330" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">fmt + validate</text>
+  <text x="491" y="349" font-size="12" fill="#3C4043" text-anchor="middle">stile e sintassi</text>
+  <text x="491" y="369" font-size="11" fill="#5F6368" text-anchor="middle">blocca se fallisce</text>
+
+  <rect x="594" y="305" width="150" height="80" rx="8" fill="#FFFFFF" stroke="#9AA0A6"/>
+  <text x="669" y="330" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">terraform plan</text>
+  <text x="669" y="349" font-size="12" fill="#3C4043" text-anchor="middle">anteprima delle</text>
+  <text x="669" y="366" font-size="12" fill="#3C4043" text-anchor="middle">modifiche</text>
+
+  <rect x="772" y="305" width="150" height="80" rx="8" fill="#FFFFFF" stroke="#9AA0A6"/>
+  <text x="847" y="330" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Salva il piano</text>
+  <text x="847" y="349" font-size="12" fill="#3C4043" text-anchor="middle">nel bucket GCS</text>
+  <text x="847" y="366" font-size="12" fill="#3C4043" text-anchor="middle">privato</text>
+
+  <rect x="950" y="305" width="150" height="80" rx="8" fill="#E6F4EA" stroke="#137333" stroke-width="1.4"/>
+  <text x="1025" y="330" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Approvazione</text>
+  <text x="1025" y="349" font-size="12" fill="#3C4043" text-anchor="middle">environment</text>
+  <text x="1025" y="366" font-size="12" fill="#3C4043" text-anchor="middle">"production"</text>
+
+  <rect x="1128" y="305" width="150" height="80" rx="8" fill="#FFFFFF" stroke="#9AA0A6"/>
+  <text x="1203" y="330" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">terraform apply</text>
+  <text x="1203" y="349" font-size="12" fill="#3C4043" text-anchor="middle">esattamente il</text>
+  <text x="1203" y="366" font-size="12" fill="#3C4043" text-anchor="middle">piano approvato</text>
+
+  <line x1="210" y1="345" x2="236" y2="345" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="388" y1="345" x2="414" y2="345" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="566" y1="345" x2="592" y2="345" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="744" y1="345" x2="770" y2="345" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="922" y1="345" x2="948" y2="345" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="1100" y1="345" x2="1126" y2="345" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="1278" y1="345" x2="1348" y2="345" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+
+  <line x1="758" y1="298" x2="758" y2="398" stroke="#7B1FA2" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="758" y="420" font-size="12" font-weight="700" fill="#7B1FA2" text-anchor="middle">PR: si ferma qui</text>
+  <text x="1025" y="420" font-size="11" fill="#5F6368" text-anchor="middle">solo su main</text>
+
+  <!-- ============ CORSIA C: APP ============ -->
+  <rect x="30" y="471" width="1280" height="325" rx="10" fill="#F8F9FA" stroke="#DADCE0"/>
+  <text x="48" y="497" font-size="17" font-weight="700" fill="#202124">Pipeline App · build e deploy</text>
+  <rect x="300" y="482" width="270" height="22" rx="11" fill="#E8F0FE"/>
+  <text x="435" y="497" font-size="11.5" font-weight="600" fill="#1967D2" text-anchor="middle">PR · push su main (app/**, k8s/**)</text>
+
+  <text x="48" y="530" font-size="11" fill="#5F6368" font-weight="700">CI</text>
+
+  <rect x="60" y="540" width="150" height="80" rx="8" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="135" y="565" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Hadolint</text>
+  <text x="135" y="584" font-size="12" fill="#3C4043" text-anchor="middle">lint del Dockerfile</text>
+  <text x="135" y="604" font-size="11" fill="#5F6368" text-anchor="middle">blocca sugli errori</text>
+
+  <rect x="238" y="540" width="150" height="80" rx="8" fill="#FFFFFF" stroke="#9AA0A6"/>
+  <text x="313" y="565" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Build</text>
+  <text x="313" y="584" font-size="12" fill="#3C4043" text-anchor="middle">immagine Docker</text>
+  <text x="313" y="604" font-size="11" fill="#5F6368" text-anchor="middle">Go 1.25 · Alpine · non-root</text>
+
+  <rect x="416" y="540" width="150" height="80" rx="8" fill="#FFFFFF" stroke="#9AA0A6"/>
+  <text x="491" y="565" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Verifica file</text>
+  <text x="491" y="584" font-size="12" fill="#3C4043" text-anchor="middle">wizexercise.txt</text>
+  <text x="491" y="604" font-size="11" fill="#5F6368" text-anchor="middle">dentro l'immagine</text>
+
+  <rect x="594" y="540" width="150" height="80" rx="8" fill="#FEF7E0" stroke="#B06000" stroke-dasharray="5 3" stroke-width="1.4"/>
+  <text x="669" y="565" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Trivy · report</text>
+  <text x="669" y="584" font-size="12" fill="#3C4043" text-anchor="middle">CVE CRITICAL + HIGH</text>
+  <text x="669" y="604" font-size="11" fill="#5F6368" text-anchor="middle">segnala → SARIF</text>
+
+  <rect x="772" y="540" width="150" height="80" rx="8" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="847" y="565" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Trivy · gate</text>
+  <text x="847" y="584" font-size="12" fill="#3C4043" text-anchor="middle">CRITICAL con fix</text>
+  <text x="847" y="604" font-size="11" fill="#5F6368" text-anchor="middle">blocca la pipeline</text>
+
+  <rect x="950" y="540" width="150" height="80" rx="8" fill="#E6F4EA" stroke="#137333" stroke-width="1.4"/>
+  <text x="1025" y="565" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Login OIDC</text>
+  <text x="1025" y="584" font-size="12" fill="#3C4043" text-anchor="middle">gh-app-deployer</text>
+  <text x="1025" y="604" font-size="11" fill="#5F6368" text-anchor="middle">token valido 1 ora</text>
+
+  <rect x="1128" y="540" width="150" height="80" rx="8" fill="#FFFFFF" stroke="#9AA0A6"/>
+  <text x="1203" y="565" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Push</text>
+  <text x="1203" y="584" font-size="12" fill="#3C4043" text-anchor="middle">su Artifact Registry</text>
+  <text x="1203" y="604" font-size="11" fill="#5F6368" text-anchor="middle">tag = commit SHA</text>
+
+  <line x1="210" y1="580" x2="236" y2="580" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="388" y1="580" x2="414" y2="580" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="566" y1="580" x2="592" y2="580" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="744" y1="580" x2="770" y2="580" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="922" y1="580" x2="948" y2="580" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="1100" y1="580" x2="1126" y2="580" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="1278" y1="580" x2="1348" y2="580" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+
+  <line x1="936" y1="533" x2="936" y2="633" stroke="#7B1FA2" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="936" y="650" font-size="12" font-weight="700" fill="#7B1FA2" text-anchor="middle">PR: si ferma qui</text>
+
+  <!-- collegamento CI -> CD -->
+  <path d="M1203,620 V664 H135 V686" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <text x="48" y="682" font-size="11" fill="#5F6368" font-weight="700">CD</text>
+
+  <rect x="60" y="690" width="150" height="80" rx="8" fill="#E6F4EA" stroke="#137333" stroke-width="1.4"/>
+  <text x="135" y="715" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Approvazione</text>
+  <text x="135" y="734" font-size="12" fill="#3C4043" text-anchor="middle">environment</text>
+  <text x="135" y="751" font-size="12" fill="#3C4043" text-anchor="middle">"production"</text>
+
+  <rect x="238" y="690" width="150" height="80" rx="8" fill="#FFFFFF" stroke="#9AA0A6"/>
+  <text x="313" y="715" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Credenziali GKE</text>
+  <text x="313" y="734" font-size="12" fill="#3C4043" text-anchor="middle">via OIDC</text>
+
+  <rect x="416" y="690" width="150" height="80" rx="8" fill="#E6F4EA" stroke="#137333" stroke-width="1.4"/>
+  <text x="491" y="715" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Secret K8s</text>
+  <text x="491" y="734" font-size="12" fill="#3C4043" text-anchor="middle">da Secret Manager</text>
+  <text x="491" y="754" font-size="11" fill="#5F6368" text-anchor="middle">mai nel repository</text>
+
+  <rect x="594" y="690" width="150" height="80" rx="8" fill="#FFFFFF" stroke="#9AA0A6"/>
+  <text x="669" y="715" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">kubectl apply</text>
+  <text x="669" y="734" font-size="12" fill="#3C4043" text-anchor="middle">RBAC · deployment</text>
+  <text x="669" y="751" font-size="12" fill="#3C4043" text-anchor="middle">service · ingress</text>
+
+  <rect x="772" y="690" width="150" height="80" rx="8" fill="#FFFFFF" stroke="#9AA0A6"/>
+  <text x="847" y="715" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Rollout</text>
+  <text x="847" y="734" font-size="12" fill="#3C4043" text-anchor="middle">attende i pod pronti</text>
+  <text x="847" y="754" font-size="11" fill="#5F6368" text-anchor="middle">e rilegge il file</text>
+
+  <line x1="210" y1="730" x2="236" y2="730" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="388" y1="730" x2="414" y2="730" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="566" y1="730" x2="592" y2="730" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="744" y1="730" x2="770" y2="730" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <line x1="922" y1="730" x2="1348" y2="730" stroke="#5F6368" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <text x="1135" y="722" font-size="11" fill="#5F6368" text-anchor="middle">deploy dell'immagine</text>
+
+  <!-- ============ DESTINAZIONI ============ -->
+  <text x="1460" y="121" font-size="13" font-weight="700" fill="#5F6368" text-anchor="middle">DESTINAZIONI</text>
+
+  <rect x="1350" y="140" width="220" height="80" rx="8" fill="#E8F0FE" stroke="#1A73E8" stroke-width="1.4"/>
+  <text x="1460" y="165" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Tab Security GitHub</text>
+  <text x="1460" y="184" font-size="12" fill="#3C4043" text-anchor="middle">risultati SARIF di</text>
+  <text x="1460" y="202" font-size="12" fill="#3C4043" text-anchor="middle">CodeQL · Checkov · Trivy</text>
+
+  <rect x="1350" y="305" width="220" height="80" rx="8" fill="#E8F0FE" stroke="#1A73E8" stroke-width="1.4"/>
+  <text x="1460" y="330" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Infrastruttura GCP</text>
+  <text x="1460" y="349" font-size="12" fill="#3C4043" text-anchor="middle">rete · VM · GKE · bucket</text>
+  <text x="1460" y="367" font-size="12" fill="#3C4043" text-anchor="middle">controlli di sicurezza</text>
+
+  <rect x="1350" y="540" width="220" height="80" rx="8" fill="#E8F0FE" stroke="#1A73E8" stroke-width="1.4"/>
+  <text x="1460" y="565" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Artifact Registry</text>
+  <text x="1460" y="584" font-size="12" fill="#3C4043" text-anchor="middle">immagini dell'app</text>
+
+  <rect x="1350" y="690" width="220" height="100" rx="8" fill="#E8F0FE" stroke="#1A73E8" stroke-width="1.4"/>
+  <text x="1460" y="715" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Cluster GKE</text>
+  <rect x="1362" y="727" width="196" height="52" rx="6" fill="#E6F4EA" stroke="#137333" stroke-width="1.4"/>
+  <text x="1460" y="747" font-size="12" font-weight="700" fill="#137333" text-anchor="middle">Binary Authorization</text>
+  <text x="1460" y="766" font-size="11" fill="#5F6368" text-anchor="middle">solo immagini del registry</text>
+
+  <!-- ============ LEGENDA ============ -->
+  <rect x="30" y="822" width="18" height="18" rx="3" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="56" y="836" font-size="13" fill="#3C4043">Controllo bloccante</text>
+  <rect x="220" y="822" width="18" height="18" rx="3" fill="#FEF7E0" stroke="#B06000" stroke-dasharray="5 3" stroke-width="1.4"/>
+  <text x="246" y="836" font-size="13" fill="#3C4043">Controllo che segnala (non blocca)</text>
+  <rect x="490" y="822" width="18" height="18" rx="3" fill="#E6F4EA" stroke="#137333" stroke-width="1.4"/>
+  <text x="516" y="836" font-size="13" fill="#3C4043">Controllo preventivo / approvazione</text>
+  <rect x="770" y="822" width="18" height="18" rx="3" fill="#FFFFFF" stroke="#9AA0A6"/>
+  <text x="796" y="836" font-size="13" fill="#3C4043">Step della pipeline</text>
+  <line x1="960" y1="831" x2="1000" y2="831" stroke="#7B1FA2" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="1008" y="836" font-size="13" fill="#3C4043">Sulle PR la pipeline si ferma qui (nessuna modifica)</text>
+  <text x="30" y="872" font-size="12" fill="#5F6368">* Gitleaks e CodeQL girano in un workflow separato: bloccano il merge solo se la branch protection su main richiede i loro check.</text>
+</svg>
