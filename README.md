@@ -39,8 +39,7 @@ Actions, e controlli di sicurezza nativi GCP.
 | `.github/workflows/iac.yml` | Pipeline 1: Checkov → plan → apply |
 | `.github/workflows/app.yml` | Pipeline 2: build → verifica file → Hadolint → Trivy → ClamAV → push → deploy |
 | `.github/workflows/security.yml` | CodeQL + Gitleaks + TruffleHog |
-| `.github/workflows/pipeline-security.yml` | Controlli sui workflow: actionlint, zizmor, versioni delle action, segreti nei YAML |
-| `.github/scripts/check-actions.sh` | Verifica che ogni action sia fissata a uno SHA, mantenuta e con runtime Node non deprecato |
+| `.github/workflows/pipeline-security.yml` | Controlli sui workflow: actionlint, zizmor, segreti nei YAML |
 | `docs/demo.md` | Script della demo live |
 
 ## Debolezze intenzionali
@@ -62,7 +61,7 @@ Actions, e controlli di sicurezza nativi GCP.
 - Workload Identity Federation: nessuna chiave di service account in GitHub
 - Due service account distinti per IaC e app (separation of duties)
 - Checkov sul Terraform, Hadolint sul Dockerfile, Trivy sull'immagine (CVE), ClamAV sull'immagine (malware), CodeQL sul codice Go, Gitleaks e TruffleHog per i segreti (TruffleHog segnala solo quelli ancora attivi), Dependabot
-- **Pipeline security** (a ogni modifica in `.github/` e ogni lunedì): actionlint (sintassi e shellcheck), zizmor (injection, permessi eccessivi, token esposti), action fissate a SHA e con runtime Node non deprecato, TruffleHog sui file dei workflow
+- **Pipeline security** (a ogni modifica in `.github/` e ogni lunedì): actionlint (sintassi e shellcheck), zizmor (injection, permessi eccessivi, token esposti, action non fissate a uno SHA o con vulnerabilità note), TruffleHog sui file dei workflow
 - Workflow irrobustiti: permessi minimi dichiarati per job (`permissions: {}` di default), `persist-credentials: false` sui checkout, nessuna espressione `${{ }}` dentro i blocchi `run`
 - Risultati pubblicati nella tab **Security** di GitHub (SARIF)
 - Environment `production` con approvazione manuale prima di apply/deploy
@@ -143,6 +142,14 @@ kubectl delete namespace tasky
 Controlla infine in console che non siano rimaste risorse a pagamento.
 
 ---
+
+## Gap noti dell'architettura
+- **Nessun controllo automatico sulle versioni deprecate delle action.** La pipeline non verifica se un'action usa un runtime Node.js deprecato o se esiste una versione major più recente. Copertura attuale solo parziale:
+  - zizmor blocca le action non fissate a uno SHA e quelle con vulnerabilità note;
+  - Dependabot propone ogni settimana gli aggiornamenti delle action (con 7 giorni di cooldown);
+  - GitHub mostra un avviso nella run quando un'action usa un runtime deprecato, ma non la blocca.
+
+  Il rischio è che una deprecazione venga notata solo quando GitHub rimuove il runtime e la pipeline si ferma. Possibile evoluzione: un job che legge `action.yml` di ogni action alla versione fissata e fallisce sui runtime deprecati.
 
 ## Problemi noti / da verificare alla prima esecuzione
 - **Chiave GPG di MongoDB 6.0**: se `apt` rifiuta la chiave scaduta, guarda `/var/log/wiz-mongo-setup.log` sulla VM. In alternativa usa `mongo_version = "7.0"`: è comunque più vecchia di un anno rispetto all'8.x.

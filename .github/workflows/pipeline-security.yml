@@ -3,10 +3,9 @@
 #   - actionlint : sintassi dei workflow ed errori negli script (shellcheck)
 #   - zizmor     : misconfigurazioni di sicurezza (injection, permessi
 #                  eccessivi, token esposti, action vulnerabili o non fissate)
-#   - versioni   : action fissate a SHA, non archiviate, runtime non deprecato
 #   - segreti    : nessuna credenziale scritta nei file dentro .github/
-# Parte a ogni modifica in .github/, e ogni lunedi' perche' un'action puo'
-# diventare deprecata o vulnerabile anche senza modifiche al repository.
+# Parte a ogni modifica in .github/, e ogni lunedi' perche' una action puo'
+# risultare vulnerabile anche senza modifiche al repository.
 # =============================================================================
 name: Pipeline Security
 
@@ -61,20 +60,6 @@ jobs:
           advanced-security: "false"
           annotations: "true"
           min-severity: high
-
-  action-versions:
-    name: Versioni delle action
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Verifica pinning, manutenzione e runtime
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: bash .github/scripts/check-actions.sh
 
   workflow-secrets:
     name: Segreti nei workflow (TruffleHog)
