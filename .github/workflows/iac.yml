@@ -178,7 +178,7 @@ jobs:
         if: steps.gke.outcome == 'success'
         run: |
           kubectl delete namespace tasky --ignore-not-found --timeout=600s
-          for i in $(seq 1 30); do
+          for _ in $(seq 1 30); do
             negs=$(gcloud compute network-endpoint-groups list --filter="network~wiz-vpc" --format="value(name)")
             [ -z "$negs" ] && exit 0
             echo "In attesa della rimozione dei NEG: $negs"
