@@ -1,0 +1,138 @@
+<svg viewBox="0 0 1440 1010" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#5F6368"/>
+    </marker>
+    <marker id="r" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#C5221F"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1440" height="1010" fill="#FFFFFF"/>
+
+  <!-- Title -->
+  <text x="40" y="44" font-size="26" font-weight="700" fill="#202124">Scenario di attacco e mitigazioni — wiz-gke / project-wiz-001</text>
+  <text x="40" y="70" font-size="14" fill="#5F6368">Catena di attacco a sinistra, difesa corrispondente a destra. Stato rilevato nell'ambiente reale.</text>
+
+  <!-- Column headers -->
+  <text x="330" y="104" font-size="17" font-weight="700" fill="#202124" text-anchor="middle">Catena di attacco</text>
+  <text x="1070" y="104" font-size="17" font-weight="700" fill="#202124" text-anchor="middle">Mitigazione</text>
+
+  <!-- ===== ROW 1: entry ===== -->
+  <rect x="40" y="120" width="600" height="80" rx="8" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="60" y="150" font-size="16" font-weight="700" fill="#202124">① App esposta a Internet</text>
+  <text x="60" y="174" font-size="13" fill="#3C4043">Ingress pubblico (GCE) → il pod Tasky è raggiungibile da chiunque</text>
+  <text x="60" y="192" font-size="12" fill="#5F6368">Superficie di attacco iniziale</text>
+
+  <rect x="770" y="120" width="600" height="80" rx="8" fill="#E8F0FE" stroke="#1A73E8" stroke-width="1.4"/>
+  <text x="790" y="150" font-size="15" font-weight="700" fill="#174EA6">WAF · Network Policy · ridurre l'esposizione</text>
+  <text x="790" y="174" font-size="13" fill="#3C4043">Cloud Armor davanti all'Ingress; limitare l'accesso a monte</text>
+  <text x="790" y="192" font-size="12" fill="#C5221F" font-weight="700">✗ da fare in produzione</text>
+
+  <line x1="640" y1="160" x2="768" y2="160" stroke="#5F6368" stroke-width="2" marker-end="url(#a)"/>
+
+  <!-- ===== ROW 2: RCE ===== -->
+  <rect x="40" y="220" width="600" height="80" rx="8" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="60" y="250" font-size="16" font-weight="700" fill="#202124">② RCE → shell nel container</text>
+  <text x="60" y="274" font-size="13" fill="#3C4043">Una vulnerabilità nell'app dà esecuzione di codice nel pod</text>
+  <text x="60" y="292" font-size="12" fill="#5F6368">L'attaccante ora è dentro il container tasky</text>
+
+  <rect x="770" y="220" width="600" height="80" rx="8" fill="#E8F0FE" stroke="#1A73E8" stroke-width="1.4"/>
+  <text x="790" y="250" font-size="15" font-weight="700" fill="#174EA6">Patching · immagine minima · runtime security</text>
+  <text x="790" y="274" font-size="13" fill="#3C4043">Trivy/Hadolint già in pipeline; container non-root, read-only FS</text>
+  <text x="790" y="292" font-size="12" fill="#B06000" font-weight="700">◑ scansione fatta, hardening runtime da completare</text>
+
+  <line x1="640" y1="260" x2="768" y2="260" stroke="#5F6368" stroke-width="2" marker-end="url(#a)"/>
+
+  <!-- ===== ROW 3: cluster-admin ===== -->
+  <rect x="40" y="320" width="600" height="80" rx="8" fill="#FCE8E6" stroke="#C5221F" stroke-width="2.4"/>
+  <text x="60" y="350" font-size="16" font-weight="700" fill="#202124">③ Token SA tasky = cluster-admin</text>
+  <text x="60" y="374" font-size="13" fill="#3C4043">Il token è auto-montato nel pod e vale cluster-admin</text>
+  <text x="60" y="392" font-size="12" fill="#C5221F" font-weight="700">◆ DEBOLEZZA INTENZIONALE dell'esercizio</text>
+
+  <rect x="770" y="320" width="600" height="80" rx="8" fill="#E8F0FE" stroke="#1A73E8" stroke-width="1.4"/>
+  <text x="790" y="350" font-size="15" font-weight="700" fill="#174EA6">Role minimo + automountServiceAccountToken: false</text>
+  <text x="790" y="374" font-size="13" fill="#3C4043">Permessi solo sulle risorse che servono; niente binding cluster-admin</text>
+  <text x="790" y="392" font-size="12" fill="#C5221F" font-weight="700">✗ lasciata aperta di proposito (da rimuovere in prod)</text>
+
+  <line x1="640" y1="360" x2="768" y2="360" stroke="#5F6368" stroke-width="2" marker-end="url(#a)"/>
+
+  <!-- ===== ROW 4: read secrets ===== -->
+  <rect x="40" y="420" width="600" height="80" rx="8" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="60" y="450" font-size="16" font-weight="700" fill="#202124">④ Legge TUTTI i Secret del cluster</text>
+  <text x="60" y="474" font-size="13" fill="#3C4043">tasky-secrets (URI MongoDB + chiave JWT) e segreti di ogni namespace</text>
+  <text x="60" y="492" font-size="12" fill="#5F6368">base64 → decodifica immediata</text>
+
+  <rect x="770" y="420" width="600" height="80" rx="8" fill="#E8F0FE" stroke="#1A73E8" stroke-width="1.4"/>
+  <text x="790" y="450" font-size="15" font-weight="700" fill="#174EA6">RBAC minimo · segregazione per namespace</text>
+  <text x="790" y="474" font-size="13" fill="#3C4043">Conseguenza diretta del punto ③: con RBAC stretto cade anche questo</text>
+  <text x="790" y="492" font-size="12" fill="#C5221F" font-weight="700">✗ dipende da ③</text>
+
+  <line x1="640" y1="460" x2="768" y2="460" stroke="#5F6368" stroke-width="2" marker-end="url(#a)"/>
+
+  <!-- ===== ROW 5: privileged pod / node escape ===== -->
+  <rect x="40" y="520" width="600" height="80" rx="8" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="60" y="550" font-size="16" font-weight="700" fill="#202124">⑤ Deploy pod privilegiato → fuga sul nodo</text>
+  <text x="60" y="574" font-size="13" fill="#3C4043">Crea un pod privileged/hostPath, esce dal container, root sulla VM GKE</text>
+  <text x="60" y="592" font-size="12" fill="#5F6368">Da "dentro un container" a "root sul nodo"</text>
+
+  <rect x="770" y="520" width="600" height="80" rx="8" fill="#E8F0FE" stroke="#1A73E8" stroke-width="1.4"/>
+  <text x="790" y="550" font-size="15" font-weight="700" fill="#174EA6">Pod Security Standards / Admission control</text>
+  <text x="790" y="574" font-size="13" fill="#3C4043">Vietare privileged, hostPath, hostNetwork a livello di cluster</text>
+  <text x="790" y="592" font-size="12" fill="#C5221F" font-weight="700">✗ da fare</text>
+
+  <line x1="640" y1="560" x2="768" y2="560" stroke="#5F6368" stroke-width="2" marker-end="url(#a)"/>
+
+  <!-- ===== ROW 6: node SA token ===== -->
+  <rect x="40" y="620" width="600" height="80" rx="8" fill="#FEF7E0" stroke="#B06000" stroke-width="1.6"/>
+  <text x="60" y="650" font-size="16" font-weight="700" fill="#202124">⑥ Dal nodo legge il token della node SA</text>
+  <text x="60" y="674" font-size="13" fill="#3C4043">Sul nodo si bypassa il metadata server → token di wiz-gke-nodes</text>
+  <text x="60" y="692" font-size="12" fill="#5F6368">Possibile solo dopo la fuga sul nodo (⑤)</text>
+
+  <rect x="770" y="620" width="600" height="80" rx="8" fill="#E6F4EA" stroke="#137333" stroke-width="1.6"/>
+  <text x="790" y="650" font-size="15" font-weight="700" fill="#0B6B2E">Workload Identity (GKE_METADATA) attivo</text>
+  <text x="790" y="674" font-size="13" fill="#3C4043">Un pod normale NON raggiunge la node SA; tasky non è legata a SA GCP</text>
+  <text x="790" y="692" font-size="12" fill="#137333" font-weight="700">✓ già configurato nel tuo ambiente</text>
+
+  <line x1="640" y1="660" x2="768" y2="660" stroke="#5F6368" stroke-width="2" marker-end="url(#a)"/>
+
+  <!-- ===== ROW 7: GCP lateral ===== -->
+  <rect x="40" y="720" width="600" height="80" rx="8" fill="#E6F4EA" stroke="#137333" stroke-width="1.6"/>
+  <text x="60" y="750" font-size="16" font-weight="700" fill="#202124">⑦ Lateral movement su GCP</text>
+  <text x="60" y="774" font-size="13" fill="#3C4043">Raggio d'azione LIMITATO: solo Artifact Registry (read) + logging/metrics</text>
+  <text x="60" y="792" font-size="12" fill="#137333" font-weight="700">✓ niente VM, bucket, IAM o Secret Manager</text>
+
+  <rect x="770" y="720" width="600" height="80" rx="8" fill="#E6F4EA" stroke="#137333" stroke-width="1.6"/>
+  <text x="790" y="750" font-size="15" font-weight="700" fill="#0B6B2E">Node SA dedicata a privilegio minimo</text>
+  <text x="790" y="774" font-size="13" fill="#3C4043">wiz-gke-nodes senza ruolo Editor → blast radius su GCP contenuto</text>
+  <text x="790" y="792" font-size="12" fill="#137333" font-weight="700">✓ già configurato nel tuo ambiente</text>
+
+  <line x1="640" y1="760" x2="768" y2="760" stroke="#5F6368" stroke-width="2" marker-end="url(#a)"/>
+
+  <!-- vertical arrows down the attack chain -->
+  <line x1="340" y1="200" x2="340" y2="218" stroke="#C5221F" stroke-width="2.4" marker-end="url(#r)"/>
+  <line x1="340" y1="300" x2="340" y2="318" stroke="#C5221F" stroke-width="2.4" marker-end="url(#r)"/>
+  <line x1="340" y1="400" x2="340" y2="418" stroke="#C5221F" stroke-width="2.4" marker-end="url(#r)"/>
+  <line x1="340" y1="500" x2="340" y2="518" stroke="#C5221F" stroke-width="2.4" marker-end="url(#r)"/>
+  <line x1="340" y1="600" x2="340" y2="618" stroke="#C5221F" stroke-width="2.4" marker-end="url(#r)"/>
+  <line x1="340" y1="700" x2="340" y2="718" stroke="#C5221F" stroke-width="2.4" marker-end="url(#r)"/>
+
+  <!-- ===== Separate path: public bucket ===== -->
+  <rect x="40" y="840" width="1330" height="120" rx="10" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.6"/>
+  <text x="60" y="872" font-size="16" font-weight="700" fill="#202124">⑧ Percorso alternativo diretto — Bucket di backup PUBBLICO (nessun cluster necessario)</text>
+  <text x="60" y="898" font-size="13" fill="#3C4043">L'attaccante elenca e scarica i dump di MongoDB direttamente da Internet (HTTP 200 anonimo) → dati + eventuali credenziali.</text>
+  <text x="60" y="920" font-size="12" fill="#C5221F" font-weight="700">◆ DEBOLEZZA INTENZIONALE dell'esercizio</text>
+  <line x1="700" y1="928" x2="760" y2="928" stroke="#5F6368" stroke-width="2" marker-end="url(#a)"/>
+  <text x="790" y="890" font-size="15" font-weight="700" fill="#174EA6">Mitigazione:</text>
+  <text x="790" y="912" font-size="13" fill="#3C4043">Bucket privato (Uniform access, no allUsers), cifratura, versioning e retention.</text>
+  <text x="790" y="934" font-size="12" fill="#C5221F" font-weight="700">✗ lasciato pubblico di proposito (da chiudere in prod)</text>
+
+  <!-- Legend -->
+  <rect x="40" y="978" width="16" height="16" rx="3" fill="#FCE8E6" stroke="#C5221F"/>
+  <text x="62" y="991" font-size="12" fill="#3C4043">aperto / da mitigare</text>
+  <rect x="210" y="978" width="16" height="16" rx="3" fill="#FEF7E0" stroke="#B06000"/>
+  <text x="232" y="991" font-size="12" fill="#3C4043">parziale</text>
+  <rect x="320" y="978" width="16" height="16" rx="3" fill="#E6F4EA" stroke="#137333"/>
+  <text x="342" y="991" font-size="12" fill="#3C4043">già mitigato nel tuo ambiente (✓)</text>
+  <text x="620" y="991" font-size="12" fill="#C5221F" font-weight="700">◆ = debolezza intenzionale richiesta dall'esercizio</text>
+</svg>

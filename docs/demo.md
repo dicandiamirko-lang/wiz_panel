@@ -24,7 +24,7 @@ lsb_release -a              # Linux obsoleto
 
 ## 3. Variabile d'ambiente e wizexercise.txt (2 min)
 ```bash
-kubectl get deploy tasky -n tasky -o jsonpath='{.spec.template.spec.containers[0].env}' | jq
+kubectl set env deployment/tasky -n tasky --list   # MONGODB_URI arriva dal Secret tasky-secrets
 kubectl exec -n tasky deploy/tasky -- cat /app/wizexercise.txt
 ```
 Mostra la riga `COPY wizexercise.txt` nel `Dockerfile` e lo step "Verifica wizexercise.txt" nella pipeline.
