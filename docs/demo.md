@@ -1,14 +1,17 @@
 # Script demo live (~25 min)
 
-Prepara prima: `gcloud container clusters get-credentials wiz-gke --zone europe-west1-b`
+Prepara prima: `gcloud container clusters get-credentials wiz-gke --zone europe-west1-b --project clgcporg10-158`
 e tieni aperte le tab console GCP: GKE, Compute, Storage, Logging, Monitoring > Alerting, GitHub Actions/Security.
+
+> Progetto lab: `clgcporg10-158` · IP pubblico attuale dell'app: `34.117.223.228`.
+> L'IP cambia a ogni redeploy: verificalo con `kubectl get ingress -n tasky`.
 
 ## 1. L'applicazione funziona (3 min)
 ```bash
 kubectl get nodes -o wide               # nodi senza EXTERNAL-IP -> subnet privata
 kubectl get pods,svc,ingress -n tasky   # IP pubblico dell'Ingress
 ```
-Apri `http://<INGRESS_IP>`, registra un utente, crea 2-3 todo.
+Apri `http://34.117.223.228`, registra un utente, crea 2-3 todo.
 
 ## 2. I dati sono nel database (3 min)
 ```bash
@@ -30,10 +33,10 @@ kubectl exec -n tasky deploy/tasky -- cat /app/wizexercise.txt
 Mostra la riga `COPY wizexercise.txt` nel `Dockerfile` e lo step "Verifica wizexercise.txt" nella pipeline.
 
 ## 4. Debolezze e impatto (8 min)
-**Bucket pubblico**: da una finestra in incognito, senza login:
+**Bucket pubblico**: da una finestra in incognito, senza login (su Windows PowerShell usa `curl.exe`):
 ```bash
-curl https://storage.googleapis.com/<PROJECT_ID>-mongo-backups          # listing XML
-curl -O https://storage.googleapis.com/<PROJECT_ID>-mongo-backups/backups/<file>
+curl https://storage.googleapis.com/clgcporg10-158-mongo-backups          # listing XML
+curl -O https://storage.googleapis.com/clgcporg10-158-mongo-backups/backups/<file>
 ```
 **cluster-admin dal container**: un attaccante con RCE nell'app:
 ```bash
