@@ -40,7 +40,7 @@ resource "google_project_iam_audit_config" "sensitive_reads" {
 # Log bucket dedicato con retention di 90 giorni per tutti gli audit log
 resource "google_logging_project_bucket_config" "audit" {
   project        = var.project_id
-  location       = "global"
+  location       = var.region # l'org policy del lab vieta "global"; europe-west1 e' tra le location consentite
   bucket_id      = "audit-logs"
   retention_days = 90
   description    = "Copia conservata di tutti i Cloud Audit Logs"

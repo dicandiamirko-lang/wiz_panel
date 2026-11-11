@@ -33,8 +33,14 @@ resource "google_secret_manager_secret" "s" {
   for_each  = local.secrets
   secret_id = each.key
 
+  # L'org policy del lab vieta la replica automatica (global): la fissiamo su una
+  # location consentita (europe-west1).
   replication {
-    auto {}
+    user_managed {
+      replicas {
+        location = var.region
+      }
+    }
   }
 }
 
