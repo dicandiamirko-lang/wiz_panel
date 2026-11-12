@@ -87,11 +87,46 @@ Provider `google ~> 6.0` e `random ~> 3.6`; **backend GCS** per lo state (il buc
 Parametri con default: progetto/regione/zona, `name_prefix=wiz`; immagine VM Ubuntu 22.04 e Mongo 6.0 (**obsoleti per scelta**); tipi macchina; `gke_master_authorized_cidr=0.0.0.0/0` (i runner GitHub hanno IP dinamici); flag `enable_org_policies` (default off, serve `orgpolicy.policyAdmin`) e `enable_binary_authorization` (default on).
 
 ## B3. `network.tf`
-- **VPC** custom (`auto_create_subnetworks=false`) → nessuna subnet automatica.
-- **Subnet `public`** `10.10.1.0/24` (VM). **Subnet `private`** `10.10.16.0/20` con `private_ip_google_access` e **range secondari** per pod (`10.20/16`) e service (`10.30/20`); **VPC Flow Logs** attivi (campionamento 0.5).
-- **Router + Cloud NAT** → uscita internet per i nodi privati.
+- **VPC** custom (`auto_create_subnetworks=false`) → rete pulita: nessuna subnet automatica, creo solo quelle che servono (segmentazione).
+- **Router + Cloud NAT** → uscita internet **solo in uscita** per i nodi privati.
 - **Firewall `ssh_from_internet`**: 22 da `0.0.0.0/0` sui tag `mongo` → **debolezza voluta**, con log.
 - **Firewall `mongo_from_gke`**: 27017 **solo** dai range della subnet GKE → il DB non è esposto a internet.
+
+### Le subnet: perché nella console ne vedo 3
+
+Nel Terraform ne definisco **due**; la terza la crea **GKE** da solo.
+
+| Subnet | Range | Chi la crea | A cosa serve |
+|---|---|---|---|
+| `wiz-public` | `10.10.1.0/24` | **io** (TF) | VM MongoDB — zona "esposta" (IP pubblico, SSH aperto) |
+| `wiz-gke-private` | `10.10.16.0/20` | **io** (TF) | nodi GKE — zona "protetta" (nessun IP pubblico, uscita via NAT) |
+| `gke-wiz-gke-…-pe-subnet` | `172.16.0.0/28` | **GKE** (auto) | *Private Service Connect*: collega i nodi al **control plane** del cluster privato senza esporlo su internet |
+
+Il suffisso `pe-subnet` = *private endpoint*; nome con hash e range fuori dal mio schema `10.x` → risorsa di sistema, non è nell'IaC. La sua presenza **conferma** che il cluster è privato (control plane non pubblico).
+
+**Separazione:** DB nella subnet esposta, app nella subnet protetta; tra le due passa solo ciò che apre il firewall (Mongo 27017 raggiungibile **solo** dalla subnet GKE).
+
+### I range secondari (solo sulla subnet privata)
+
+La subnet `wiz-gke-private` ha, oltre al range primario (i **nodi**), due **range secondari**:
+
+| Range secondario | CIDR | A cosa serve |
+|---|---|---|
+| `pods` | `10.20.0.0/16` | un IP per ogni **pod** |
+| `services` | `10.30.0.0/20` | un IP per ogni **Service** Kubernetes |
+
+Servono perché il cluster è **VPC-native**: i pod hanno IP **reali della VPC** (via *alias IP*), non IP "finti" nascosti nei nodi. Vantaggi: firewall e **VPC Flow Logs** applicabili direttamente sui pod, scalabilità, e **load balancing nativo** (il LB parla ai pod). GCP **non** crea i range secondari di default: li dichiaro io e il cluster li aggancia per nome (`ip_allocation_policy` in `gke.tf`). I **VPC Flow Logs** sono attivi (campionamento 0.5).
+
+### Cosa scarica il Cloud NAT (quali immagini)
+
+Il NAT dà ai nodi privati una via **in uscita**; nessuno da internet può aprire connessioni verso di loro. Ma **non** tutte le immagini passano di lì:
+
+| Immagine da… | Come arriva | Usa il NAT? |
+|---|---|---|
+| **Artifact Registry/GCR di Google** (la tua `tasky`) | *Private Google Access* (`private_ip_google_access=true`) | **No** — corsia privata verso le API Google |
+| **Docker Hub, quay.io, ghcr.io, registry.k8s.io** (terze parti/community) | **Cloud NAT** → internet | **Sì** |
+
+Quindi l'immagine dell'app Tasky **non** usa il NAT; il NAT serve per immagini di terze parti (es. `nginx` da Docker Hub del test di Binary Authorization), add-on da `registry.k8s.io` e in generale l'outbound dei pod (update OS, chiamate ad API esterne).
 
 ## B4. `mongo_vm.tf`
 - **SA `wiz-mongo-vm`** + binding **`compute.admin` e `serviceAccountUser`** (18-26) → **privilege escalation voluta**: chi entra nella VM crea VM con altre SA.
@@ -122,6 +157,12 @@ All'avvio: installa Mongo nella versione obsoleta e **blocca gli update** (`apt-
 - **Audit logging** (15-38): abilita `ADMIN_READ`+`DATA_WRITE` su tutti i servizi e `DATA_READ` su storage e secret.
 - **Log bucket `audit-logs`** + **sink** (41-54): copia tutti i `cloudaudit` log, retention 90gg, `location=europe-west1` (no `global` per l'org policy).
 - **Binary Authorization policy** (61-75): default `ALWAYS_DENY` + whitelist solo `wiz-apps` → immagini esterne negate.
+
+> **Perché ho aggiunto Binary Authorization (scelta mia, non un requisito esplicito).**
+> È un controllo **preventivo** che **blocca il deploy di qualsiasi container la cui immagine non provenga da una whitelist** — nel mio caso **solo** il mio Artifact Registry `wiz-apps`. Ogni altra immagine (presa da internet, Docker Hub, ecc.) viene **negata all'ammissione, prima di partire**.
+> L'ho messo perché ho testato tutto sul **mio tenant GCP** e, essendoci nell'ambiente una **vulnerabilità grave voluta** dall'esercizio, volevo essere certo che ci fosse una **mitigazione** capace di impedire il deploy di **container non autorizzati** (ad es. un **cryptominer** avviato sfruttando quella vulnerabilità). Così, anche se qualcuno riuscisse a ottenere accesso al cluster, **non potrebbe far girare immagini arbitrarie**: solo quelle costruite e pubblicate dalla mia pipeline.
+> **Dove vederlo:** Console → *Security → Binary Authorization* (scheda Policy); da terminale `gcloud container binauthz policy export`; conferma sul cluster con `gcloud container clusters describe wiz-gke --zone europe-west1-b --format="value(binaryAuthorization.evaluationMode)"` (→ `PROJECT_SINGLETON_POLICY_ENFORCE`). Fonte di verità: `security.tf` (policy) e `gke.tf` (abilitazione).
+
 - **Org Policy opzionali** (81-105, dietro flag): disabilita chiavi SA; limita le location a `eu`.
 - **Detective** (110-179): un notification channel email (se `alert_email` valorizzata) e **6 alert policy** basate su filtri di log (bucket pubblico, firewall aperto, modifica IAM, chiave SA, `kubectl exec`, immagine bloccata da BinAuthz).
 
