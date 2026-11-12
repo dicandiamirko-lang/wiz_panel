@@ -1,0 +1,84 @@
+<svg viewBox="0 0 1460 940" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <rect x="0" y="0" width="1460" height="940" fill="#FFFFFF"/>
+
+  <!-- Title -->
+  <text x="40" y="44" font-size="26" font-weight="700" fill="#202124">Checkov vs Security Command Center — stessi rischi, risultati diversi</text>
+  <text x="40" y="70" font-size="14" fill="#5F6368">Dati reali dell'ambiente wiz-gke / clgcporg10-158. Due strumenti, due tassonomie, copertura a buchi.</text>
+
+  <!-- Venn circles -->
+  <ellipse cx="540" cy="420" rx="470" ry="270" fill="#1A73E8" fill-opacity="0.08" stroke="#1A73E8" stroke-width="2"/>
+  <ellipse cx="920" cy="420" rx="470" ry="270" fill="#7B1FA2" fill-opacity="0.08" stroke="#7B1FA2" stroke-width="2"/>
+
+  <!-- circle headers -->
+  <text x="300" y="195" font-size="19" font-weight="700" fill="#174EA6" text-anchor="middle">CHECKOV</text>
+  <text x="300" y="216" font-size="12.5" fill="#5F6368" text-anchor="middle">IaC statico · PRE-deploy · framework: terraform</text>
+  <text x="1160" y="195" font-size="19" font-weight="700" fill="#6A1B9A" text-anchor="middle">SCC</text>
+  <text x="1160" y="216" font-size="12.5" fill="#5F6368" text-anchor="middle">runtime cloud · POST-deploy · risorse reali</text>
+
+  <!-- LEFT only: Checkov -->
+  <text x="150" y="275" font-size="14" font-weight="700" fill="#174EA6">Solo Checkov (~20) — best practice IaC</text>
+  <text x="150" y="302" font-size="13" fill="#3C4043">• CMEK dischi / bucket / Artifact Registry</text>
+  <text x="150" y="325" font-size="13" fill="#3C4043">• VPC Flow Logs · Intranode Visibility</text>
+  <text x="150" y="348" font-size="13" fill="#3C4043">• Network Policy · Shielded VM</text>
+  <text x="150" y="371" font-size="13" fill="#3C4043">• Bucket logging / versioning</text>
+  <text x="150" y="394" font-size="13" fill="#3C4043">• Igiene ruoli SA · OIDC trust</text>
+  <text x="150" y="417" font-size="13" fill="#3C4043">• Label · control plane pubblico</text>
+  <text x="150" y="452" font-size="12.5" font-style="italic" fill="#C5221F">tutti severità "error":</text>
+  <text x="150" y="471" font-size="12.5" font-style="italic" fill="#C5221F">nessuna priorità</text>
+
+  <!-- OVERLAP: both -->
+  <text x="730" y="300" font-size="14" font-weight="700" fill="#202124" text-anchor="middle">Entrambi (3)</text>
+  <text x="730" y="345" font-size="13" fill="#202124" text-anchor="middle" font-weight="600">SSH aperto</text>
+  <text x="730" y="365" font-size="11" fill="#5F6368" text-anchor="middle">CKV_GCP_2 / OPEN_SSH_PORT</text>
+  <text x="730" y="398" font-size="13" fill="#202124" text-anchor="middle" font-weight="600">Bucket pubblico</text>
+  <text x="730" y="418" font-size="11" fill="#5F6368" text-anchor="middle">CKV_GCP_28 / PUBLIC_BUCKET_ACL</text>
+  <text x="730" y="451" font-size="13" fill="#202124" text-anchor="middle" font-weight="600">IP pubblico VM</text>
+  <text x="730" y="471" font-size="11" fill="#5F6368" text-anchor="middle">CKV_GCP_40 / PUBLIC_IP_ADDRESS</text>
+  <text x="730" y="505" font-size="11.5" font-style="italic" fill="#C5221F" text-anchor="middle">ID e severità diversi → dedup impossibile</text>
+
+  <!-- RIGHT only: SCC -->
+  <text x="990" y="275" font-size="14" font-weight="700" fill="#6A1B9A">Solo SCC — runtime</text>
+  <rect x="988" y="288" width="330" height="40" rx="6" fill="#FCE8E6" stroke="#C5221F" stroke-width="1.4"/>
+  <text x="1000" y="306" font-size="13" font-weight="700" fill="#202124">cluster-admin (GKE_PRIVILEGE_ESCALATION)</text>
+  <text x="1000" y="322" font-size="11.5" fill="#C5221F">il rischio #1 — invisibile a Checkov</text>
+  <text x="990" y="352" font-size="13" fill="#3C4043">• CVE immagine tasky (CRITICAL/HIGH)</text>
+  <text x="990" y="375" font-size="13" fill="#3C4043">• container run-as-root</text>
+  <text x="990" y="398" font-size="13" fill="#3C4043">• GKE security bulletin (versione)</text>
+  <text x="990" y="421" font-size="13" fill="#3C4043">• bucket pubblico preesistente del lab</text>
+  <text x="990" y="456" font-size="12.5" font-style="italic" fill="#137333">severità reali (HIGH/CRIT):</text>
+  <text x="990" y="475" font-size="12.5" font-style="italic" fill="#137333">focalizzato sullo sfruttabile</text>
+
+  <!-- counters -->
+  <text x="300" y="640" font-size="13" fill="#5F6368" text-anchor="middle">~27 finding · tutti "error"</text>
+  <text x="1160" y="640" font-size="13" fill="#5F6368" text-anchor="middle">9 tipi · con severità</text>
+
+  <!-- Bottom banner -->
+  <rect x="40" y="712" width="1380" height="188" rx="10" fill="#F8F9FA" stroke="#DADCE0"/>
+  <text x="60" y="742" font-size="17" font-weight="700" fill="#202124">Perché per il triage è un problema (punto per il panel)</text>
+
+  <text x="60" y="772" font-size="13.5" font-weight="700" fill="#174EA6">1 · Nessun ID né severità comuni</text>
+  <text x="60" y="792" font-size="12.5" fill="#3C4043">CKV_GCP_28 "error" ≠ PUBLIC_BUCKET_ACL "HIGH":</text>
+  <text x="60" y="810" font-size="12.5" fill="#3C4043">lo stesso rischio, non correlabile in automatico.</text>
+
+  <text x="420" y="772" font-size="13.5" font-weight="700" fill="#C5221F">2 · Copertura a buchi</text>
+  <text x="420" y="792" font-size="12.5" fill="#3C4043">Il cluster-admin (rischio #1) sfugge a Checkov;</text>
+  <text x="420" y="810" font-size="12.5" fill="#3C4043">le CVE immagine pure. Nessuno è completo.</text>
+
+  <text x="760" y="772" font-size="13.5" font-weight="700" fill="#B06000">3 · Rumore vs segnale</text>
+  <text x="760" y="792" font-size="12.5" fill="#3C4043">27 "error" (molti best-practice) contro 9</text>
+  <text x="760" y="810" font-size="12.5" fill="#3C4043">con severità: cosa prioritizzo?</text>
+
+  <text x="1080" y="772" font-size="13.5" font-weight="700" fill="#0B6B2E">4 · Layer / timing diversi</text>
+  <text x="1080" y="792" font-size="12.5" fill="#3C4043">Checkov = shift-left (pre-apply);</text>
+  <text x="1080" y="810" font-size="12.5" fill="#3C4043">SCC = verità runtime + drift.</text>
+
+  <line x1="60" y1="832" x2="1400" y2="832" stroke="#DADCE0"/>
+  <text x="60" y="862" font-size="14" font-weight="700" fill="#202124">→ Serve una piattaforma che normalizza, deduplica e prioritizza per attack path (toxic combination).</text>
+  <text x="60" y="884" font-size="12.5" fill="#5F6368">È la proposta di Wiz: trasforma la ridondanza non correlata in copertura, e dice cosa sistemare per primo.</text>
+
+  <!-- legend -->
+  <rect x="1150" y="846" width="14" height="14" rx="3" fill="#1A73E8" fill-opacity="0.18" stroke="#1A73E8"/>
+  <text x="1170" y="858" font-size="11.5" fill="#3C4043">Checkov</text>
+  <rect x="1255" y="846" width="14" height="14" rx="3" fill="#7B1FA2" fill-opacity="0.18" stroke="#7B1FA2"/>
+  <text x="1275" y="858" font-size="11.5" fill="#3C4043">SCC</text>
+</svg>

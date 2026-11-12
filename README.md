@@ -38,7 +38,7 @@ Actions, e controlli di sicurezza nativi GCP.
 | `k8s/` | Namespace, RBAC (cluster-admin), Deployment, Service, Ingress |
 | `.github/workflows/iac.yml` | Pipeline 1: Checkov → plan → apply |
 | `.github/workflows/app.yml` | Pipeline 2: build → verifica file → Hadolint → Trivy → ClamAV → push → deploy |
-| `.github/workflows/security.yml` | CodeQL + Gitleaks + TruffleHog |
+| `.github/workflows/security.yml` | CodeQL + TruffleHog |
 | `.github/workflows/pipeline-security.yml` | Controlli sui workflow: actionlint, zizmor, segreti nei YAML |
 | `docs/demo.md` | Script della demo live |
 
@@ -60,7 +60,7 @@ Actions, e controlli di sicurezza nativi GCP.
 **Pipeline / repository (DevSecOps)**
 - Workload Identity Federation: nessuna chiave di service account in GitHub
 - Due service account distinti per IaC e app (separation of duties)
-- Checkov sul Terraform, Hadolint sul Dockerfile, Trivy sull'immagine (CVE), ClamAV sull'immagine (malware), CodeQL sul codice Go, Gitleaks e TruffleHog per i segreti (TruffleHog segnala solo quelli ancora attivi), Dependabot
+- Checkov sul Terraform, Hadolint sul Dockerfile, Trivy sull'immagine (CVE), ClamAV sull'immagine (malware), CodeQL sul codice Go, TruffleHog per i segreti (segnala solo quelli ancora attivi), Dependabot
 - **Pipeline security** (a ogni modifica in `.github/` e ogni lunedì): actionlint (sintassi e shellcheck), zizmor (injection, permessi eccessivi, token esposti, action non fissate a uno SHA o con vulnerabilità note), TruffleHog sui file dei workflow
 - Workflow irrobustiti: permessi minimi dichiarati per job (`permissions: {}` di default), `persist-credentials: false` sui checkout, nessuna espressione `${{ }}` dentro i blocchi `run`
 - Risultati pubblicati nella tab **Security** di GitHub (SARIF)

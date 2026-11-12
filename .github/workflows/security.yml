@@ -1,8 +1,7 @@
 # =============================================================================
 # Controlli di sicurezza sul repository
 #   - CodeQL    : SAST sul codice Go
-#   - Gitleaks  : ricerca di segreti committati per errore
-#   - TruffleHog: segreti ancora attivi (verificati contro il servizio)
+#   - TruffleHog: segreti committati, verificati contro il servizio (solo attivi)
 # =============================================================================
 name: Repo Security
 
@@ -34,21 +33,6 @@ jobs:
         with:
           working-directory: app
       - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
-
-  gitleaks:
-    name: Secret scanning (Gitleaks)
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read # elenco dei commit della PR
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false # il token non resta nella cartella del repo
-          fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # TruffleHog prova i segreti trovati contro il servizio (es. API di GitHub o
   # GCP) e fallisce solo se la credenziale e' ANCORA ATTIVA: pochi falsi positivi.

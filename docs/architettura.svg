@@ -37,7 +37,7 @@
   <rect x="45" y="228" width="250" height="150" rx="8" fill="#FFFFFF" stroke="#D0D7DE"/>
   <text x="60" y="250" font-size="14" font-weight="700" fill="#202124">Repository e workflow</text>
   <text x="60" y="272" font-size="12.5" fill="#137333">• CodeQL (analisi codice Go)</text>
-  <text x="60" y="292" font-size="12.5" fill="#137333">• Gitleaks + TruffleHog (segreti)</text>
+  <text x="60" y="292" font-size="12.5" fill="#137333">• TruffleHog (segreti, solo attivi)</text>
   <text x="60" y="312" font-size="12.5" fill="#137333">• actionlint + zizmor (workflow)</text>
   <text x="60" y="332" font-size="12.5" fill="#137333">• Dependabot · action fissate a SHA</text>
   <rect x="55" y="341" width="230" height="28" rx="5" fill="#F1F3F4" stroke="#80868B" stroke-dasharray="3 3"/>
