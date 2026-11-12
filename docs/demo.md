@@ -59,6 +59,10 @@ kubectl run test --image=nginx -n tasky      # NEGATO
 ```
 **Detective**: Monitoring > Alerting: incident "[SEC] kubectl exec in un pod" e "[SEC] Immagine bloccata" generati dai comandi appena eseguiti.
 
+**Edge WAF (Cloud Armor, preview)**: Network Security > Cloud Armor > `tasky-waf-preview`: regole OWASP (SQLi, XSS, LFI, RCE, scanner) in preview sul LB. Mostra i log di cosa *avrebbe* bloccato senza interrompere l'app. Punto chiave: i vettori reali dell'esercizio (SSH, bucket, cluster-admin) non passano dal LB → Cloud Armor non li tocca; è messo in preview di proposito.
+
+**Dato sensibile (DLP)**: Security > Sensitive Data Protection: inspection sul bucket `clgcporg10-158-mongo-backups`. Punto onesto: i backup sono archivi `mongodump --gzip` (binari), che il DLP non parsa → 0 finding sul formato attuale. Per far emergere i dati servirebbe un export in JSON/CSV. Dimostra quando un controllo *non* basta da solo.
+
 **Audit log**: Logs Explorer, query:
 ```
 logName:"cloudaudit.googleapis.com" AND protoPayload.methodName="io.k8s.core.v1.pods.exec.create"
