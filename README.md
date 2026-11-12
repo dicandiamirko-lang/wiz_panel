@@ -71,7 +71,10 @@ Actions, e controlli di sicurezza nativi GCP.
 - *Audit logging*: Admin Activity (sempre attivi) + Data Access abilitati; copia in un log bucket dedicato con retention di 90 giorni; audit log del control plane Kubernetes inclusi
 - *Preventivo*: **Binary Authorization**: GKE accetta solo immagini dal nostro Artifact Registry. Opzionali: Org Policy `iam.disableServiceAccountKeyCreation` e `gcp.resourceLocations`
 - *Detective*: 6 alert Cloud Monitoring basati sugli audit log (bucket reso pubblico, firewall aperto a internet, modifiche IAM, chiavi SA, `kubectl exec`, immagine bloccata)
-- *Consigliato*: attivare **Security Command Center** (Standard) dalla console: rileva da solo bucket pubblico, SSH aperto, VM con SA privilegiata
+- *Rilevamento cloud (attivi)*:
+  - **Security Command Center** (Standard): rileva da solo bucket pubblico, SSH aperto, VM con SA privilegiata, privilege escalation GKE (cluster-admin), CVE delle immagini
+  - **Cloud Armor**: WAF OWASP (SQLi, XSS, LFI, RCE, scanner detection) sul Load Balancer dell'app, in **preview mode** (non bloccante): logga cosa bloccherebbe senza interrompere l'esposizione intenzionale. Comandi e note in `docs/cloud-armor-dlp.md`
+  - **Sensitive Data Protection (DLP)**: inspection sul bucket di backup per qualificare la sensibilità dei dati (toxic combination "bucket pubblico + dati sensibili"); limiti sul formato binario dei dump in `docs/cloud-armor-dlp.md`
 
 ---
 

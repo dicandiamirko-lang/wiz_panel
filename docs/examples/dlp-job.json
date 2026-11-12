@@ -1,0 +1,21 @@
+{
+  "inspectJob": {
+    "storageConfig": {
+      "cloudStorageOptions": {
+        "fileSet": { "url": "gs://clgcporg10-158-mongo-backups/**" }
+      }
+    },
+    "inspectConfig": {
+      "infoTypes": [
+        { "name": "EMAIL_ADDRESS" },
+        { "name": "PHONE_NUMBER" },
+        { "name": "IP_ADDRESS" },
+        { "name": "GCP_CREDENTIALS" },
+        { "name": "AUTH_TOKEN" },
+        { "name": "CREDIT_CARD_NUMBER" }
+      ],
+      "minLikelihood": "POSSIBLE",
+      "limits": { "maxFindingsPerRequest": 100 }
+    }
+  }
+}
