@@ -106,6 +106,27 @@ Il suffisso `pe-subnet` = *private endpoint*; nome con hash e range fuori dal mi
 
 **Separazione:** DB nella subnet esposta, app nella subnet protetta; tra le due passa solo ciò che apre il firewall (Mongo 27017 raggiungibile **solo** dalla subnet GKE).
 
+### Le regole firewall: quali creo io e quali crea GKE
+
+Nella console ne vedi **5**: **2 le definisco io** nel Terraform, **3 le crea GKE/Load Balancer** in automatico. Si distinguono dal nome: `wiz-allow-*` = mie e nell'IaC; nome con **hash** (`gke-…`, `k8s-fw-…`) = auto-create e gestite dal servizio.
+
+**Le 2 mie (`network.tf`):**
+
+| Regola | Apre | A chi | Perché |
+|---|---|---|---|
+| `wiz-allow-ssh-from-internet` | **22 (SSH)** | da `0.0.0.0/0` (tutto internet) → tag `mongo` | **Debolezza voluta**: la VM MongoDB è raggiungibile in SSH da chiunque (con log) |
+| `wiz-allow-mongo-from-gke` | **27017 (MongoDB)** | **solo** dai range della subnet GKE → tag `mongo` | Il DB è raggiungibile **solo** dall'app nel cluster, **non** da internet |
+
+> Contrasto da raccontare: la 22 aperta a tutti è il rischio **intenzionale**; la 27017 invece è configurata **bene** (ristretta alla sola rete GKE).
+
+**Le 3 di GKE (automatiche):**
+
+| Regola | A cosa serve |
+|---|---|
+| `gke-…-all` | Traffico **interno** tra nodi, pod e service del cluster (la rete Kubernetes deve comunicare al suo interno) |
+| `gke-…-vms` | Regole per i **nodi** (VM del cluster): health check e comunicazione di sistema tra i componenti GKE |
+| `k8s-fw-l7-…` | Regola del **Load Balancer L7** (Ingress): lascia entrare i **Google health check** e il traffico del bilanciatore verso i pod → è ciò che fa funzionare l'IP pubblico dell'app (descr. *"GCE L7 firewall rule"*) |
+
 ### I range secondari (solo sulla subnet privata)
 
 La subnet `wiz-gke-private` ha, oltre al range primario (i **nodi**), due **range secondari**:
