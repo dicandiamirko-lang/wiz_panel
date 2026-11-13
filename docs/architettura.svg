@@ -35,11 +35,12 @@
   <text x="170" y="203" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">GitHub · wiz_panel</text>
 
   <rect x="45" y="228" width="250" height="150" rx="8" fill="#FFFFFF" stroke="#D0D7DE"/>
-  <text x="60" y="250" font-size="14" font-weight="700" fill="#202124">Repository e workflow</text>
-  <text x="60" y="272" font-size="12.5" fill="#137333">• CodeQL (analisi codice Go)</text>
-  <text x="60" y="292" font-size="12.5" fill="#137333">• TruffleHog (segreti, solo attivi)</text>
-  <text x="60" y="312" font-size="12.5" fill="#137333">• actionlint + zizmor (workflow)</text>
-  <text x="60" y="332" font-size="12.5" fill="#137333">• Dependabot · action fissate a SHA</text>
+  <text x="60" y="246" font-size="14" font-weight="700" fill="#202124">Security + Pipeline Security</text>
+  <text x="60" y="261" font-size="10.5" fill="#5F6368">2 pipeline: scan del codice + scan della CI/CD</text>
+  <text x="60" y="280" font-size="12.5" fill="#137333">• CodeQL (SAST codice Go) · security.yml</text>
+  <text x="60" y="298" font-size="12.5" fill="#137333">• TruffleHog (segreti attivi) · security.yml</text>
+  <text x="60" y="316" font-size="12.5" fill="#137333">• actionlint + zizmor · pipeline-security.yml</text>
+  <text x="60" y="334" font-size="12.5" fill="#137333">• Dependabot · action fissate a SHA</text>
   <rect x="55" y="341" width="230" height="28" rx="5" fill="#F1F3F4" stroke="#80868B" stroke-dasharray="3 3"/>
   <text x="170" y="359" font-size="11.5" font-weight="600" fill="#5F6368" text-anchor="middle">Gap: nessun controllo action deprecate</text>
 
