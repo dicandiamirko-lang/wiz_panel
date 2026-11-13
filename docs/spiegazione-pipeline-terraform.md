@@ -174,6 +174,15 @@ All'avvio: installa Mongo nella versione obsoleta e **blocca gli update** (`apt-
 - **Node pool** `default-pool`: tipo macchina, **Shielded VM** (secure boot + integrity), **`GKE_METADATA`** (Workload Identity attivo, blocca l'abuso del metadata server), auto-repair/upgrade.
 - **Artifact Registry `wiz-apps`** (Docker, regionale).
 
+### Le StorageClass che vedo nel cluster (non le ho create io)
+
+In *Kubernetes Engine → Storage → Storage Classes* compaiono ~10 voci (`standard`, `standard-rwo`, `premium-rwo`, `dynamic`, vari `*-rwx`…). **Le crea GKE di serie su ogni cluster**, non sono nell'IaC e **nel mio progetto non vengono usate**.
+
+- **Cosa sono:** un "listino" dei **tipi di disco** che un pod può chiedere con una *PersistentVolumeClaim* per avere storage **persistente** (provisionato dinamicamente da GKE).
+- **Due famiglie:** provisioner `pd.csi…` = **Persistent Disk** a blocchi, accesso `rwo` (*ReadWriteOnce*, un nodo alla volta, tipico dei DB); provisioner `filestore.csi…` = **Filestore/NFS** condiviso, accesso `rwx` (*ReadWriteMany*, più pod insieme). Le `premium/pd-ssd` sono più veloci, `standard` più economiche.
+- **Perché non le uso:** i dati dell'app stanno su **MongoDB in una VM dedicata** (col suo disco), non su volumi persistenti nel cluster → nessun pod richiede una PVC. Le vedo solo perché sono preset di default.
+- **Evoluzione da citare:** in un'architettura cloud-native "pura" si potrebbe spostare MongoDB nel cluster come StatefulSet con volumi (es. StorageClass `premium-rwo`).
+
 ## B9. `security.tf`
 - **Audit logging** (15-38): abilita `ADMIN_READ`+`DATA_WRITE` su tutti i servizi e `DATA_READ` su storage e secret.
 - **Log bucket `audit-logs`** + **sink** (41-54): copia tutti i `cloudaudit` log, retention 90gg, `location=europe-west1` (no `global` per l'org policy).
