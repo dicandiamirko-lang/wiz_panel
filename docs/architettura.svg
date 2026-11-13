@@ -206,8 +206,15 @@
   <path d="M1190,117 H1395 V328" fill="none" stroke="#C5221F" stroke-width="2" marker-end="url(#arrRed)"/>
   <text x="1205" y="108" font-size="12" font-weight="600" fill="#C5221F">download dei backup senza login</text>
 
-  <!-- VM -> bucket backup -->
+  <!-- VM -> bucket backup (canale: push via API HTTPS, auth SA) -->
   <path d="M1170,600 H1222 V385 H1238" fill="none" stroke="#5F6368" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="975" y="486" font-size="11.5" fill="#3C4043" text-anchor="middle">backup: mongodump &#8594; gcloud storage cp</text>
+  <text x="975" y="502" font-size="11" fill="#5F6368" text-anchor="middle">HTTPS 443 &#8594; storage.googleapis.com &#183; auth SA</text>
+
+  <!-- GKE nodi -> Cloud NAT -> Internet (solo uscita) -->
+  <line x1="575" y1="712" x2="575" y2="733" stroke="#5F6368" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="468" y1="760" x2="358" y2="760" stroke="#5F6368" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="414" y="752" font-size="11" font-weight="600" fill="#5F6368" text-anchor="end">Internet (solo uscita)</text>
 
   <!-- Legenda -->
   <rect x="400" y="872" width="16" height="16" rx="3" fill="#FEF3C7" stroke="#B45309"/>
