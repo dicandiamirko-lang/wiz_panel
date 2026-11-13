@@ -49,7 +49,7 @@ Principi comuni a tutti i workflow:
 **Job `deploy`** (122-174): solo su main, `environment: production` (seconda approvazione). Si autentica (SA app), prende le credenziali del cluster, poi:
 - **Namespace e RBAC** (148-149): applica `00-namespace.yaml` + `01-rbac.yaml` (crea la SA `tasky` e il binding cluster-admin).
 - **Secret K8s** (151-160): legge `mongodb-uri` e `app-jwt-secret` da **Secret Manager**, li maschera nei log (`::add-mask::`) e crea il Secret `tasky-secrets` con `apply` idempotente. I segreti **non sono mai nel repo**.
-- **Deploy**: `sed` sostituisce `IMAGE_PLACEHOLDER` con l'immagine appena buildata e applica il Deployment; poi ricava l'**IP statico globale** del LB (`gcloud compute addresses describe wiz-tasky-ip --global`), costruisce l'hostname `nip.io`, lo inietta in `04-tls.yaml` (`HOST_PLACEHOLDER`) e applica **TLS + Service/Ingress**; attende il `rollout status`.
+- **Deploy**: `sed` sostituisce `IMAGE_PLACEHOLDER` con l'immagine buildata e applica Deployment + Service/Ingress (l'Ingress aggancia l'IP statico `wiz-tasky-ip` per nome). Poi **legge l'IP dallo stato dell'Ingress** (`kubectl … jsonpath='{.status.loadBalancer.ingress[0].ip}'`, con attesa fino a ~10 min) — **nessun permesso Compute**, l'app SA resta least-privilege — costruisce l'hostname `nip.io`, lo inietta in `04-tls.yaml` (`HOST_PLACEHOLDER`) e crea il **ManagedCertificate**; attende il `rollout status`.
 - **Verifica**: mostra pod/svc/ingress, lo stato del `managedcertificate` (`Provisioning`→`Active`), stampa l'URL HTTPS e rilegge `wizexercise.txt` dal pod in esecuzione.
 
 > **Metodo di deploy del container: push-based via GitHub Actions** (`kubectl apply`), **non** ArgoCD né FluxCD. Vedi `docs/comandi.md` §Deploy per la spiegazione completa.
