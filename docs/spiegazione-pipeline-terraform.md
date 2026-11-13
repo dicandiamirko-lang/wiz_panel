@@ -163,6 +163,20 @@ All'avvio: installa Mongo nella versione obsoleta e **blocca gli update** (`apt-
 - **`backups_public`**: `allUsers` = `storage.objectViewer` → **lettura + listing pubblici** (objectViewer include get *e* list).
 - **`backups_writer`**: la SA della VM può solo scrivere (`objectCreator`).
 
+### Quali bucket sono miei (org GCP condivisa)
+
+Nella console compaiono vari bucket: sono in un'**org condivisa** (CloudLabs), quindi vedo anche quelli di altri. **Solo due sono miei.**
+
+| Bucket | Di chi | Cosa contiene |
+|---|---|---|
+| `clgcporg10-158-mongo-backups` | **mio** (IaC) | backup di MongoDB; è il bucket **pubblico** → **debolezza voluta** |
+| `clgcporg10-158-wiz-tfstate` | **mio** (bootstrap) | **stato Terraform**; privato (configurato bene) |
+| `clgcporg10-158-tfstate` | **non mio** (pre-esistente) | state di altro/vecchio uso → **non toccare** |
+| `wiz-terraform-state-clgcporg10-158` | **non mio** | state di terzi → **non toccare** |
+| `todo-wayne-tfstate`, `wiz-preprod-mongodb-backups-…`, `wiz-prod-mongodb-backups-…` | **non miei** (altre persone) | esercizi altrui → **non toccare** |
+
+**Come riconoscere i miei:** prefisso `clgcporg10-158-`, region `europe-west1`, creati durante il mio deploy. Il `terraform destroy` tocca **solo** i miei; gli altri appartengono ad altri tenant della stessa org e non vanno mai cancellati.
+
 ## B7. `secrets.tf`
 - Tre `random_password` (admin, app, jwt).
 - `locals.secrets`: le 3 password + la **connection string** `mongodb-uri` costruita con l'IP interno statico.
