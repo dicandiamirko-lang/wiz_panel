@@ -25,3 +25,16 @@ output "gke_get_credentials" {
 output "artifact_registry" {
   value = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.apps.repository_id}"
 }
+
+# IP statico globale del LB dell'app e hostname/URL HTTPS (nip.io).
+output "app_lb_ip" {
+  value = google_compute_global_address.tasky_lb.address
+}
+
+output "app_hostname" {
+  value = "${replace(google_compute_global_address.tasky_lb.address, ".", "-")}.nip.io"
+}
+
+output "app_url" {
+  value = "https://${replace(google_compute_global_address.tasky_lb.address, ".", "-")}.nip.io"
+}

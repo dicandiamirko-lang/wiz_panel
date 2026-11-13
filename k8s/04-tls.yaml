@@ -1,0 +1,29 @@
+# -----------------------------------------------------------------------------
+# HTTPS per l'app Tasky (GKE Ingress + HTTP(S) Load Balancer esterno).
+#
+# - ManagedCertificate: Google emette e RINNOVA da solo un certificato valido per
+#   l'hostname nip.io. HOST_PLACEHOLDER viene sostituito dalla pipeline app.yml
+#   con "<IP-LB-con-trattini>.nip.io" (IP statico riservato nel Terraform).
+# - FrontendConfig: forza il redirect 80 -> 443 (nessun traffico resta in chiaro).
+#
+# La terminazione TLS avviene sul Load Balancer: l'app Tasky NON va modificata
+# (continua a ricevere HTTP sulla :8080 dal LB).
+# -----------------------------------------------------------------------------
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: tasky-cert
+  namespace: tasky
+spec:
+  domains:
+    - HOST_PLACEHOLDER
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: tasky-frontend
+  namespace: tasky
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: MOVED_PERMANENTLY_DEFAULT

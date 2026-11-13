@@ -49,8 +49,8 @@ Principi comuni a tutti i workflow:
 **Job `deploy`** (122-174): solo su main, `environment: production` (seconda approvazione). Si autentica (SA app), prende le credenziali del cluster, poi:
 - **Namespace e RBAC** (148-149): applica `00-namespace.yaml` + `01-rbac.yaml` (crea la SA `tasky` e il binding cluster-admin).
 - **Secret K8s** (151-160): legge `mongodb-uri` e `app-jwt-secret` da **Secret Manager**, li maschera nei log (`::add-mask::`) e crea il Secret `tasky-secrets` con `apply` idempotente. I segreti **non sono mai nel repo**.
-- **Deploy** (162-168): `sed` sostituisce `IMAGE_PLACEHOLDER` con l'immagine appena buildata, applica Deployment + Service/Ingress, attende il `rollout status`.
-- **Verifica** (170-173): mostra pod/svc/ingress e rilegge `wizexercise.txt` dal pod in esecuzione.
+- **Deploy**: `sed` sostituisce `IMAGE_PLACEHOLDER` con l'immagine appena buildata e applica il Deployment; poi ricava l'**IP statico globale** del LB (`gcloud compute addresses describe wiz-tasky-ip --global`), costruisce l'hostname `nip.io`, lo inietta in `04-tls.yaml` (`HOST_PLACEHOLDER`) e applica **TLS + Service/Ingress**; attende il `rollout status`.
+- **Verifica**: mostra pod/svc/ingress, lo stato del `managedcertificate` (`Provisioning`→`Active`), stampa l'URL HTTPS e rilegge `wizexercise.txt` dal pod in esecuzione.
 
 > **Metodo di deploy del container: push-based via GitHub Actions** (`kubectl apply`), **non** ArgoCD né FluxCD. Vedi `docs/comandi.md` §Deploy per la spiegazione completa.
 
@@ -220,5 +220,6 @@ Comodità per la demo: IP pubblico/interno della VM, **comando SSH pronto**, URL
 - **`00-namespace.yaml`**: namespace `tasky`.
 - **`01-rbac.yaml`**: SA `tasky` + **ClusterRoleBinding a `cluster-admin`** → **debolezza voluta**: una RCE nell'app = controllo totale del cluster.
 - **`02-deployment.yaml`**: 2 repliche, `serviceAccountName: tasky`, immagine da placeholder, `MONGODB_URI`/`SECRET_KEY` dal Secret `tasky-secrets`, readiness/liveness su `:8080/`, resource limits.
-- **`03-service-ingress.yaml`**: Service ClusterIP 80→8080 con annotazione **NEG** (container-native LB); Ingress `gce` → crea l'HTTP Load Balancer esterno con IP pubblico.
+- **`03-service-ingress.yaml`**: Service ClusterIP 80→8080 con annotazione **NEG** (container-native LB); Ingress `gce` → crea l'HTTP(S) Load Balancer esterno. Annotazioni HTTPS: `global-static-ip-name` (IP statico del Terraform), `managed-certificates` (certificato Google-managed) e `FrontendConfig` (redirect 80→443).
+- **`04-tls.yaml`**: **HTTPS**. `ManagedCertificate` → Google emette e rinnova da solo un certificato valido per l'hostname `nip.io` (`HOST_PLACEHOLDER` sostituito dalla pipeline con `<IP-LB-con-trattini>.nip.io`). `FrontendConfig` → forza il **redirect 80→443**. La terminazione TLS è sul Load Balancer: l'app non va modificata. Le debolezze intenzionali restano invariate (l'HTTPS cifra solo il trasporto).
 - **`Dockerfile`**: build multi-stage (Go 1.25 → Alpine 3.24), copia `wizexercise.txt`, **`USER 65532`** (non-root), espone 8080.

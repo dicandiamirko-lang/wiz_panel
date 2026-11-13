@@ -27,8 +27,11 @@ kubectl get pods,svc,ingress -n tasky     # stato app + IP pubblico dell'Ingress
 - `get pods,svc,ingress` = pod in `Running`, Service, e l'IP del Load Balancer nell'Ingress.
 
 ```bash
-kubectl get ingress -n tasky              # legge l'IP pubblico corrente (cambia se rifai il LB)
-curl.exe -I http://<IP>                    # verifica HTTP 200 dall'esterno
+kubectl get ingress -n tasky              # IP statico del LB (wiz-tasky-ip, fisso)
+kubectl get managedcertificate -n tasky   # stato TLS: Provisioning -> Active (~15-60 min)
+# hostname = <IP-con-trattini>.nip.io ; es. 34.120.1.5 -> 34-120-1-5.nip.io
+curl.exe -I https://<IP-con-trattini>.nip.io   # verifica HTTPS 200 dall'esterno
+curl.exe -I http://<IP-con-trattini>.nip.io    # 301 -> redirect a HTTPS
 ```
 
 ## 2. Database e dati

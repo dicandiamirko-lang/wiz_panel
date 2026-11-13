@@ -20,7 +20,7 @@ e *cosa dire* in una frase. Progetto `clgcporg10-158` · regione `europe-west1` 
 | **GKE cluster** | Kubernetes Engine > Clusters → `wiz-gke` | `gcloud container clusters describe wiz-gke --zone europe-west1-b` | zonale, nodi privati, Workload Identity, Binary Authorization |
 | **Nodi GKE** | Kubernetes Engine > Clusters > Nodes | `kubectl get nodes -o wide` | nessun EXTERNAL-IP → confermano che sono in subnet privata |
 | **Artifact Registry** | Artifact Registry > Repositories → `wiz-apps` | `gcloud artifacts docker images list europe-west1-docker.pkg.dev/clgcporg10-158/wiz-apps` | registro Docker privato; Binary Authorization accetta solo immagini da qui |
-| **Load Balancer** | Network services > Load balancing | `gcloud compute forwarding-rules list --global` | HTTP LB creato dall'Ingress GKE; IP pubblico dell'app |
+| **Load Balancer** | Network services > Load balancing | `gcloud compute forwarding-rules list --global` | HTTP(S) LB creato dall'Ingress GKE; IP statico globale `wiz-tasky-ip`, certificato Google-managed (nip.io), redirect 80→443 |
 
 ## 2. GCP — dati e segreti
 
