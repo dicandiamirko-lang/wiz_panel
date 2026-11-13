@@ -107,10 +107,10 @@ kubectl create secret generic tasky-secrets -n tasky \
 
 # 6. deploy dei manifest (sostituisci il placeholder dell'immagine)
 sed "s|IMAGE_PLACEHOLDER|$IMG|" k8s/02-deployment.yaml | kubectl apply -f -
-# HTTPS: ricava l'hostname nip.io dall'IP statico e applica TLS + Ingress
-LB_IP=$(gcloud compute addresses describe wiz-tasky-ip --global --format='value(address)')
+kubectl apply -f k8s/03-service-ingress.yaml    # aggancia l'IP statico wiz-tasky-ip
+# HTTPS: leggi l'IP dallo stato dell'Ingress e crea il certificato nip.io
+LB_IP=$(kubectl get ingress tasky -n tasky -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 sed "s|HOST_PLACEHOLDER|${LB_IP//./-}.nip.io|" k8s/04-tls.yaml | kubectl apply -f -
-kubectl apply -f k8s/03-service-ingress.yaml
 kubectl rollout status deployment/tasky -n tasky --timeout=300s
 echo "App URL: https://${LB_IP//./-}.nip.io"
 ```
