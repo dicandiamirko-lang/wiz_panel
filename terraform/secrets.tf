@@ -26,6 +26,10 @@ locals {
     "mongo-app-password"   = random_password.mongo_app.result
     "app-jwt-secret"       = random_password.jwt.result
     "mongodb-uri"          = "mongodb://tasky:${random_password.mongo_app.result}@${google_compute_address.mongo_internal.address}:27017/go-mongodb?authSource=go-mongodb"
+    # Hostname HTTPS dell'app (nip.io) derivato dall'IP STATICO del LB. Non e' un
+    # segreto: sta qui perche' la pipeline app lo legge con il ruolo che ha gia'
+    # (secretAccessor), senza permessi Compute. Evita la race sull'IP dell'Ingress.
+    "app-hostname" = "${replace(google_compute_global_address.tasky_lb.address, ".", "-")}.nip.io"
   }
 }
 

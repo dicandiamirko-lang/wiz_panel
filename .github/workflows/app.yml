@@ -164,22 +164,17 @@ jobs:
           IMAGE_REF: ${{ needs.build.outputs.image }}
         run: |
           sed "s|IMAGE_PLACEHOLDER|$IMAGE_REF|" k8s/02-deployment.yaml | kubectl apply -f -
-          # Applica Service/Ingress: l'Ingress aggancia l'IP statico "wiz-tasky-ip" per nome.
-          kubectl apply -f k8s/03-service-ingress.yaml
-          # HTTPS: ricava l'IP del LB dallo STATO dell'Ingress (nessun permesso Compute
-          # richiesto; l'app SA e' least-privilege) e costruisce l'hostname nip.io.
-          LB_IP=""
-          for i in $(seq 1 40); do
-            LB_IP=$(kubectl get ingress tasky -n tasky -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
-            [ -n "$LB_IP" ] && break
-            echo "attendo l'IP del Load Balancer... ($i/40)"; sleep 15
-          done
-          if [ -z "$LB_IP" ]; then echo "::error::IP del Load Balancer non assegnato"; exit 1; fi
-          APP_HOST="${LB_IP//./-}.nip.io"
+          # HTTPS: l'hostname nip.io viene dall'IP STATICO del LB (wiz-tasky-ip), scritto
+          # dal Terraform nel secret "app-hostname". NON si legge lo stato dell'Ingress:
+          # subito dopo l'apply mostra ancora l'IP vecchio e il certificato verrebbe
+          # chiesto per un dominio sbagliato (FailedNotVisible). L'app SA usa solo il
+          # ruolo secretAccessor che ha gia', nessun permesso Compute.
+          APP_HOST=$(gcloud secrets versions access latest --secret=app-hostname)
           echo "App URL: https://$APP_HOST"
-          # Certificato Google-managed per l'hostname nip.io: l'Ingress lo referenzia
-          # gia' via annotazione e lo aggancia alla prossima riconciliazione.
+          # Certificato prima dell'Ingress, che lo referenzia via annotazione.
           sed "s|HOST_PLACEHOLDER|$APP_HOST|" k8s/04-tls.yaml | kubectl apply -f -
+          # L'Ingress aggancia l'IP statico "wiz-tasky-ip" per nome.
+          kubectl apply -f k8s/03-service-ingress.yaml
           kubectl rollout status deployment/tasky -n tasky --timeout=300s
 
       - name: Verifica
@@ -187,6 +182,5 @@ jobs:
           kubectl get pods,svc,ingress -n tasky -o wide
           # Il certificato Google-managed passa da Provisioning -> Active in ~15-60 min
           kubectl get managedcertificate -n tasky
-          LB_IP=$(kubectl get ingress tasky -n tasky -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-          echo "App URL: https://${LB_IP//./-}.nip.io"
+          echo "App URL: https://$(gcloud secrets versions access latest --secret=app-hostname)"
           kubectl exec -n tasky deploy/tasky -- cat /app/wizexercise.txt

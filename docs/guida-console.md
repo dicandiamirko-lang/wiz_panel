@@ -29,7 +29,7 @@ e *cosa dire* in una frase. Progetto `clgcporg10-158` · regione `europe-west1` 
 | **Bucket backup (pubblico)** | Cloud Storage > Buckets → `clgcporg10-158-mongo-backups` → Permissions | `gcloud storage buckets get-iam-policy gs://clgcporg10-158-mongo-backups` | `allUsers` = `storage.objectViewer` → lettura e listing pubblici (debolezza voluta) |
 | **Prova esposizione** | — | `curl.exe https://storage.googleapis.com/clgcporg10-158-mongo-backups` | listing XML senza login: chiunque scarica i dump |
 | **Bucket state (privato)** | Cloud Storage > `clgcporg10-158-wiz-tfstate` | `gcloud storage buckets describe gs://clgcporg10-158-wiz-tfstate` | `public_access_prevention=enforced` + versioning: lo state (con le password) è protetto |
-| **Secret Manager** | Security > Secret Manager | `gcloud secrets list` | 4 segreti: `mongo-admin-password`, `mongo-app-password`, `app-jwt-secret`, `mongodb-uri`; generati da Terraform, mai nel repo |
+| **Secret Manager** | Security > Secret Manager | `gcloud secrets list` | 5 voci: `mongo-admin-password`, `mongo-app-password`, `app-jwt-secret`, `mongodb-uri` + `app-hostname` (hostname HTTPS nip.io, non segreto); generate da Terraform, mai nel repo |
 
 ## 3. GCP — identità e accessi
 
