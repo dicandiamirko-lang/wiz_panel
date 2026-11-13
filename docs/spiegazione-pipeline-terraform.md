@@ -184,7 +184,7 @@ Nella console compaiono vari bucket: sono in un'**org condivisa** (CloudLabs), q
 
 ## B8. `gke.tf`
 - **SA `wiz-gke-nodes`** con ruoli **minimi** (log, metriche, `artifactregistry.reader`) → **least privilege**, contiene il movimento laterale cloud.
-- **Cluster `wiz-gke`** zonale: nodi privati (`enable_private_nodes`), **endpoint pubblico** ma limitato da `master_authorized_networks` (per kubectl da pipeline/demo); `ip_allocation_policy` usa i range secondari; **Workload Identity** (`workload_pool`); release channel REGULAR; HTTP LB addon on (serve all'Ingress); **Binary Authorization** `PROJECT_SINGLETON_POLICY_ENFORCE`; logging SYSTEM+WORKLOADS+**APISERVER** (audit control plane).
+- **Cluster `wiz-gke`** zonale: nodi privati (`enable_private_nodes`), **endpoint pubblico** ma limitato da `master_authorized_networks` (per kubectl da pipeline/demo); `ip_allocation_policy` usa i range secondari; **Workload Identity** (`workload_pool`); release channel REGULAR; addon **HTTP(S) Load Balancing** on (serve all'Ingress, anche per l'HTTPS); **Binary Authorization** `PROJECT_SINGLETON_POLICY_ENFORCE`; logging SYSTEM+WORKLOADS+**APISERVER** (audit control plane).
 - **Node pool** `default-pool`: tipo macchina, **Shielded VM** (secure boot + integrity), **`GKE_METADATA`** (Workload Identity attivo, blocca l'abuso del metadata server), auto-repair/upgrade.
 - **Artifact Registry `wiz-apps`** (Docker, regionale).
 
