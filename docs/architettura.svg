@@ -23,7 +23,7 @@
 
   <rect x="455" y="90" width="185" height="55" rx="8" fill="#F1F3F4" stroke="#5F6368"/>
   <text x="547" y="114" font-size="15" font-weight="600" fill="#202124" text-anchor="middle">Utenti</text>
-  <text x="547" y="133" font-size="12" fill="#5F6368" text-anchor="middle">browser · HTTP</text>
+  <text x="547" y="133" font-size="12" fill="#5F6368" text-anchor="middle">browser · HTTPS</text>
 
   <rect x="1030" y="90" width="160" height="55" rx="8" fill="#FCE8E6" stroke="#C5221F"/>
   <text x="1110" y="114" font-size="15" font-weight="600" fill="#202124" text-anchor="middle">Internet</text>

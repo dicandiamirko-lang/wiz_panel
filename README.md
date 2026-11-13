@@ -9,10 +9,10 @@ Actions, e controlli di sicurezza nativi GCP.
 ```
                     Internet
         ┌──────────────┼───────────────────────────┐
-        │ HTTP         │ SSH (0.0.0.0/0) ⚠         │ lettura/listing pubblici ⚠
+        │ HTTPS        │ SSH (0.0.0.0/0) ⚠         │ lettura/listing pubblici ⚠
         ▼              ▼                           ▼
  ┌──────────────┐ ┌─────────────────────────┐ ┌──────────────────────┐
- │ Cloud HTTP LB│ │ VM wiz-mongo-vm         │ │ GCS <proj>-mongo-    │
+ │ Cloud LB     │ │ VM wiz-mongo-vm         │ │ GCS <proj>-mongo-    │
  │ (GKE Ingress)│ │ Ubuntu 22.04 ⚠          │ │ backups (allUsers) ⚠ │
  └──────┬───────┘ │ MongoDB 6.0 ⚠ (auth on) │ └──────────▲───────────┘
         │         │ SA: compute.admin ⚠     │──mongodump─┘ cron 02:00
@@ -27,6 +27,12 @@ Actions, e controlli di sicurezza nativi GCP.
 ```
 ⚠ = debolezza intenzionale richiesta dall'esercizio.
 
+L'app è esposta in **HTTPS**: il GKE Ingress crea un HTTP(S) Load Balancer con
+IP statico globale, certificato **Google-managed** su hostname `nip.io` e
+**redirect 80→443**. La terminazione TLS è sul LB; le debolezze intenzionali qui
+sopra restano invariate (l'HTTPS cifra solo il trasporto, non cambia SSH aperto,
+bucket pubblico, cluster-admin, VM obsoleta).
+
 ## Struttura del repository
 
 | Percorso | Contenuto |
@@ -35,7 +41,7 @@ Actions, e controlli di sicurezza nativi GCP.
 | `terraform/` | Tutta l'infrastruttura (rete, VM, bucket, GKE, Artifact Registry, Secret Manager, controlli di sicurezza) |
 | `terraform/scripts/mongo-startup.sh.tpl` | Installa MongoDB, crea gli utenti, abilita l'auth, configura il backup giornaliero |
 | `app/` | Applicazione Tasky (Go) + `Dockerfile` + `wizexercise.txt` |
-| `k8s/` | Namespace, RBAC (cluster-admin), Deployment, Service, Ingress |
+| `k8s/` | Namespace, RBAC (cluster-admin), Deployment, Service, Ingress, TLS (ManagedCertificate + FrontendConfig) |
 | `.github/workflows/iac.yml` | Pipeline 1: Checkov → plan → apply |
 | `.github/workflows/app.yml` | Pipeline 2: build → verifica file → Hadolint → Trivy → ClamAV → push → deploy |
 | `.github/workflows/security.yml` | CodeQL + TruffleHog |
@@ -133,7 +139,7 @@ git push -u origin main
 ```
 1. Parte **IaC - Terraform**: approva l'environment → circa 10-15 minuti (GKE è la parte lenta).
 2. A infrastruttura pronta, lancia **App - Build & Deploy** da *Actions → Run workflow* (al primo push potrebbe partire prima che il cluster esista).
-3. L'IP pubblico dell'app compare nel job "Verifica" (`kubectl get ingress`); il load balancer impiega 3-5 minuti a diventare attivo.
+3. L'URL HTTPS dell'app (`https://<IP-con-trattini>.nip.io`) compare nel job "Verifica". Il load balancer impiega 3-5 minuti a diventare attivo; il certificato Google-managed passa da `Provisioning` ad `Active` in ~15-60 minuti (fino ad allora il browser mostra un avviso TLS transitorio).
 
 ### 5. Teardown
 *Actions → IaC - Terraform → Run workflow → destroy*, poi in locale `terraform destroy` in `bootstrap/`.

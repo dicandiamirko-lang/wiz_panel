@@ -3,15 +3,16 @@
 Prepara prima: `gcloud container clusters get-credentials wiz-gke --zone europe-west1-b --project clgcporg10-158`
 e tieni aperte le tab console GCP: GKE, Compute, Storage, Logging, Monitoring > Alerting, GitHub Actions/Security.
 
-> Progetto lab: `clgcporg10-158` · IP pubblico attuale dell'app: `8.233.208.101`.
-> L'IP cambia a ogni redeploy: verificalo con `kubectl get ingress -n tasky`.
+> Progetto lab: `clgcporg10-158` · l'app è esposta in **HTTPS** su hostname `nip.io`.
+> L'IP statico del LB è fisso (`wiz-tasky-ip`); l'URL è `https://<IP-con-trattini>.nip.io`.
+> Ricavalo con `kubectl get ingress -n tasky` (IP) e `kubectl get managedcertificate -n tasky` (stato TLS).
 
 ## 1. L'applicazione funziona (3 min)
 ```bash
 kubectl get nodes -o wide               # nodi senza EXTERNAL-IP -> subnet privata
 kubectl get pods,svc,ingress -n tasky   # IP pubblico dell'Ingress
 ```
-Apri `http://8.233.208.101`, registra un utente, crea 2-3 todo.
+Apri `https://<IP-con-trattini>.nip.io` (es. `https://8-233-208-101.nip.io`), registra un utente, crea 2-3 todo.
 
 ## 2. I dati sono nel database (3 min)
 ```bash

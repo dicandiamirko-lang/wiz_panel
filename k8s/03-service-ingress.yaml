@@ -13,7 +13,9 @@ spec:
     - port: 80
       targetPort: 8080
 ---
-# Ingress GKE -> crea un Google Cloud HTTP(S) Load Balancer esterno con IP pubblico
+# Ingress GKE -> crea un Google Cloud HTTP(S) Load Balancer esterno.
+# HTTPS: IP statico globale (Terraform) + certificato Google-managed (nip.io) +
+# redirect 80->443 via FrontendConfig. Vedi k8s/04-tls.yaml.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -21,6 +23,9 @@ metadata:
   namespace: tasky
   annotations:
     kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "wiz-tasky-ip"
+    networking.gke.io/managed-certificates: "tasky-cert"
+    networking.gke.io/v1beta1.FrontendConfig: "tasky-frontend"
 spec:
   defaultBackend:
     service:

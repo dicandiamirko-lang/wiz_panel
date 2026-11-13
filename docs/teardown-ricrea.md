@@ -71,7 +71,7 @@ terraform output    # copia i valori nelle Variables di GitHub se il progetto è
 ```
 2. **IaC**: push su `main` (o Actions → "IaC - Terraform" → Run → `apply`) → **approva** → ~10-15 min (GKE è lento).
 3. **App**: Actions → "App - Build & Deploy" → Run workflow → **approva** → build, push, deploy.
-4. **IP dell'app**: `kubectl get ingress -n tasky` (il LB impiega 3-5 min a diventare attivo).
+4. **URL dell'app**: `kubectl get ingress -n tasky` (IP statico `wiz-tasky-ip`) → `https://<IP-con-trattini>.nip.io`. Il LB impiega 3-5 min; il certificato Google-managed (`kubectl get managedcertificate -n tasky`) passa ad `Active` in ~15-60 min.
 5. **Cloud Armor + DLP** (fuori Terraform): riesegui i comandi in `docs/cloud-armor-dlp.md`.
 
 ---
@@ -107,8 +107,12 @@ kubectl create secret generic tasky-secrets -n tasky \
 
 # 6. deploy dei manifest (sostituisci il placeholder dell'immagine)
 sed "s|IMAGE_PLACEHOLDER|$IMG|" k8s/02-deployment.yaml | kubectl apply -f -
+# HTTPS: ricava l'hostname nip.io dall'IP statico e applica TLS + Ingress
+LB_IP=$(gcloud compute addresses describe wiz-tasky-ip --global --format='value(address)')
+sed "s|HOST_PLACEHOLDER|${LB_IP//./-}.nip.io|" k8s/04-tls.yaml | kubectl apply -f -
 kubectl apply -f k8s/03-service-ingress.yaml
 kubectl rollout status deployment/tasky -n tasky --timeout=300s
+echo "App URL: https://${LB_IP//./-}.nip.io"
 ```
 **Spiegazione (passi non ovvi):**
 - `apply` bootstrap = ricrea API, bucket state, WIF e SA; serve **prima** di tutto il resto.

@@ -1,0 +1,111 @@
+<svg viewBox="-150 0 950 770" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5F6368"/>
+    </marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1A73E8"/>
+    </marker>
+  </defs>
+
+  <rect x="-150" y="0" width="950" height="770" fill="#FFFFFF"/>
+
+  <!-- Outer: Google Cloud -->
+  <rect x="12" y="12" width="776" height="746" rx="6" fill="#FFFFFF" stroke="#202124" stroke-width="2"/>
+  <path d="M34,46 a11,11 0 0 1 0,-22 a14,14 0 0 1 26,-3 a10,10 0 0 1 2,25 z" fill="#4285F4"/>
+  <text x="74" y="44" font-size="18" font-weight="700" fill="#202124">Google Cloud</text>
+
+  <!-- VPC -->
+  <rect x="40" y="92" width="540" height="648" rx="6" fill="none" stroke="#34A853" stroke-width="2"/>
+  <path d="M55,110 v-3 a6,6 0 0 1 12,0 v3" fill="none" stroke="#34A853" stroke-width="2"/>
+  <rect x="52" y="110" width="18" height="13" rx="2" fill="#34A853"/>
+  <text x="80" y="122" font-size="16" font-weight="700" fill="#202124">VPC &#183; wiz-vpc</text>
+
+  <!-- Region / Zone (dashed) -->
+  <rect x="160" y="66" width="340" height="674" rx="6" fill="none" stroke="#4285F4" stroke-width="1.5" stroke-dasharray="7 5"/>
+  <text x="330" y="86" font-size="13.5" font-weight="700" fill="#3C4043" text-anchor="middle">Region europe-west1 &#183; Zone europe-west1-b</text>
+
+  <!-- Public Subnet -->
+  <rect x="185" y="135" width="290" height="235" rx="6" fill="#E6F4EA" stroke="#A8D5B5"/>
+  <path d="M199,154 v-3 a6,6 0 0 1 12,0 v3" fill="none" stroke="#1E8E3E" stroke-width="2"/>
+  <rect x="196" y="154" width="18" height="13" rx="2" fill="#1E8E3E"/>
+  <text x="224" y="166" font-size="14" font-weight="700" fill="#137333">Public Subnet &#183; 10.10.1.0/24</text>
+
+  <!-- MongoDB VM -->
+  <path d="M296,210 v56 a34,13 0 0 0 68,0 v-56 z" fill="#4DB33D" stroke="#3F9C35" stroke-width="1.5"/>
+  <ellipse cx="330" cy="210" rx="34" ry="13" fill="#57C843" stroke="#3F9C35" stroke-width="1.5"/>
+  <path d="M330,200 c-4,6 -4,14 0,20 c4,-6 4,-14 0,-20 z" fill="#3F9C35"/>
+  <text x="330" y="305" font-size="14.5" font-weight="700" fill="#202124" text-anchor="middle">MongoDB VM</text>
+  <text x="330" y="324" font-size="12" fill="#5F6368" text-anchor="middle">wiz-mongo-vm &#183; public subnet</text>
+
+  <!-- Private Subnet -->
+  <rect x="185" y="405" width="290" height="325" rx="6" fill="#E8F0FE" stroke="#AEC9F7"/>
+  <path d="M199,424 v-3 a6,6 0 0 1 12,0 v3" fill="none" stroke="#1A73E8" stroke-width="2"/>
+  <rect x="196" y="424" width="18" height="13" rx="2" fill="#1A73E8"/>
+  <text x="224" y="436" font-size="14" font-weight="700" fill="#174EA6">Private Subnet &#183; 10.10.16.0/20</text>
+
+  <!-- Cloud LB / Ingress -->
+  <rect x="248" y="455" width="164" height="44" rx="6" fill="#FFFFFF" stroke="#1A73E8" stroke-width="1.5"/>
+  <text x="330" y="476" font-size="13.5" font-weight="700" fill="#174EA6" text-anchor="middle">Cloud Load Balancer</text>
+  <text x="330" y="492" font-size="11.5" fill="#5F6368" text-anchor="middle">Ingress · TLS (nip.io)</text>
+
+  <!-- Container (Tasky) -->
+  <rect x="303" y="515" width="54" height="44" rx="4" fill="#FFFFFF" stroke="#E8710A" stroke-width="2"/>
+  <rect x="311" y="523" width="4" height="28" fill="#E8710A"/>
+  <rect x="319" y="523" width="4" height="28" fill="#E8710A"/>
+  <rect x="327" y="523" width="4" height="28" fill="#E8710A"/>
+  <rect x="335" y="523" width="4" height="28" fill="#E8710A"/>
+  <rect x="343" y="523" width="4" height="28" fill="#E8710A"/>
+  <text x="330" y="577" font-size="13.5" font-weight="700" fill="#202124" text-anchor="middle">Tasky container</text>
+  <text x="330" y="594" font-size="11.5" fill="#5F6368" text-anchor="middle">pod &#183; cluster-admin</text>
+
+  <!-- node (K8s hexagon) -->
+  <path d="M330,620 L362,638 L362,674 L330,692 L298,674 L298,638 Z" fill="#326CE5" stroke="#1A4FA0" stroke-width="1.5"/>
+  <text x="330" y="661" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">node</text>
+
+  <!-- Cloud Storage bucket (outside VPC) -->
+  <ellipse cx="700" cy="196" rx="52" ry="11" fill="#669DF6" stroke="#1A73E8" stroke-width="1.5"/>
+  <path d="M648,196 l10,86 h84 l10,-86 z" fill="#4285F4" stroke="#1A73E8" stroke-width="1.5"/>
+  <path d="M686,228 l10,-16 l10,16 z" fill="#FFFFFF"/>
+  <rect x="672" y="236" width="16" height="16" rx="2" fill="#FFFFFF"/>
+  <circle cx="716" cy="244" r="8" fill="#FFFFFF"/>
+  <text x="700" y="304" font-size="14.5" font-weight="700" fill="#202124" text-anchor="middle">Cloud Storage</text>
+  <text x="700" y="322" font-size="12" fill="#5F6368" text-anchor="middle">DB Backup (public)</text>
+
+  <!-- GKE (managed service, outside VPC) -->
+  <path d="M700,598 L742,622 L742,670 L700,694 L658,670 L658,622 Z" fill="#326CE5" stroke="#1A4FA0" stroke-width="1.5"/>
+  <circle cx="700" cy="646" r="19" fill="none" stroke="#FFFFFF" stroke-width="2.5"/>
+  <circle cx="700" cy="646" r="4" fill="#FFFFFF"/>
+  <g stroke="#FFFFFF" stroke-width="2.5">
+    <line x1="700" y1="646" x2="700" y2="629"/>
+    <line x1="700" y1="646" x2="715" y2="655"/>
+    <line x1="700" y1="646" x2="685" y2="655"/>
+  </g>
+  <text x="700" y="722" font-size="13.5" font-weight="700" fill="#202124" text-anchor="middle">GKE</text>
+  <text x="700" y="739" font-size="11" fill="#5F6368" text-anchor="middle">Kubernetes Engine</text>
+
+  <!-- Internet / users (OUTSIDE the GCP perimeter) -->
+  <path d="M-94,470 a11,11 0 0 1 0,-22 a14,14 0 0 1 26,-3 a10,10 0 0 1 2,25 z" fill="#F1F3F4" stroke="#5F6368"/>
+  <text x="-83" y="505" font-size="12.5" font-weight="600" fill="#3C4043" text-anchor="middle">Internet</text>
+  <text x="-83" y="521" font-size="11" fill="#5F6368" text-anchor="middle">users</text>
+
+  <!-- ===== Arrows ===== -->
+  <!-- Internet -> LB (crosses the GCP + VPC perimeter) -->
+  <line x1="-40" y1="473" x2="245" y2="474" stroke="#5F6368" stroke-width="2" marker-end="url(#g)"/>
+  <text x="95" y="464" font-size="11" font-weight="600" fill="#5F6368" text-anchor="middle">HTTPS (TLS, 80&#8594;443)</text>
+
+  <!-- MongoDB -> bucket (backup) -->
+  <line x1="366" y1="212" x2="644" y2="212" stroke="#5F6368" stroke-width="2" marker-end="url(#g)"/>
+  <text x="505" y="203" font-size="12" font-weight="600" fill="#5F6368" text-anchor="middle">daily backup</text>
+
+  <!-- Container -> MongoDB (dashed) -->
+  <path d="M359,528 H450 V250 H368" fill="none" stroke="#5F6368" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#g)"/>
+  <text x="462" y="392" font-size="11.5" fill="#5F6368">TCP 27017</text>
+
+  <!-- GKE -> node (manages) -->
+  <line x1="656" y1="650" x2="366" y2="655" stroke="#5F6368" stroke-width="2" marker-end="url(#g)"/>
+  <text x="515" y="641" font-size="12" font-weight="600" fill="#5F6368" text-anchor="middle">manages nodes</text>
+
+  <!-- LB -> container -->
+  <line x1="330" y1="499" x2="330" y2="513" stroke="#1A73E8" stroke-width="2" marker-end="url(#b)"/>
+</svg>

@@ -8,7 +8,7 @@ Progetto: `clgcporg10-158` · regione: `europe-west1`.
 ## Cloud Armor — WAF OWASP in preview
 
 ### Perché preview e non block
-Cloud Armor agisce **solo** sul traffico HTTP che passa dal Load Balancer dell'app.
+Cloud Armor agisce **solo** sul traffico HTTP(S) che passa dal Load Balancer dell'app.
 I vettori d'attacco dell'esercizio **non** passano da lì:
 
 | Debolezza intenzionale | Cloud Armor la vede? |
