@@ -11,7 +11,7 @@
   <rect x="0" y="0" width="1440" height="1010" fill="#FFFFFF"/>
 
   <!-- Title -->
-  <text x="40" y="44" font-size="26" font-weight="700" fill="#202124">Scenario di attacco e mitigazioni — wiz-gke / project-wiz-001</text>
+  <text x="40" y="44" font-size="26" font-weight="700" fill="#202124">Scenario di attacco e mitigazioni — wiz-gke / clgcporg10-158</text>
   <text x="40" y="70" font-size="14" fill="#5F6368">Catena di attacco a sinistra, difesa corrispondente a destra. Stato rilevato nell'ambiente reale.</text>
 
   <!-- Column headers -->
