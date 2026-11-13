@@ -12,7 +12,7 @@ e tieni aperte le tab console GCP: GKE, Compute, Storage, Logging, Monitoring > 
 kubectl get nodes -o wide               # nodi senza EXTERNAL-IP -> subnet privata
 kubectl get pods,svc,ingress -n tasky   # IP pubblico dell'Ingress
 ```
-Apri `https://<IP-con-trattini>.nip.io` (es. `https://8-233-208-101.nip.io`), registra un utente, crea 2-3 todo.
+Apri `https://<IP-con-trattini>.nip.io` (oggi `https://136-81-22-112.nip.io`; lo leggi con `gcloud secrets versions access latest --secret=app-hostname`), registra un utente, crea 2-3 todo.
 
 ## 2. I dati sono nel database (3 min)
 ```bash

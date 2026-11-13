@@ -71,7 +71,7 @@ terraform output    # copia i valori nelle Variables di GitHub se il progetto è
 ```
 2. **IaC**: push su `main` (o Actions → "IaC - Terraform" → Run → `apply`) → **approva** → ~10-15 min (GKE è lento).
 3. **App**: Actions → "App - Build & Deploy" → Run workflow → **approva** → build, push, deploy.
-4. **URL dell'app**: `kubectl get ingress -n tasky` (IP statico `wiz-tasky-ip`) → `https://<IP-con-trattini>.nip.io`. Il LB impiega 3-5 min; il certificato Google-managed (`kubectl get managedcertificate -n tasky`) passa ad `Active` in ~15-60 min.
+4. **URL dell'app**: `gcloud secrets versions access latest --secret=app-hostname` (o `terraform output app_url`) → `https://<IP-con-trattini>.nip.io`. Il LB impiega 3-5 min; il certificato Google-managed (`kubectl get managedcertificate -n tasky`) passa ad `Active` in ~15-60 min.
 5. **Cloud Armor + DLP** (fuori Terraform): riesegui i comandi in `docs/cloud-armor-dlp.md`.
 
 ---
@@ -107,12 +107,13 @@ kubectl create secret generic tasky-secrets -n tasky \
 
 # 6. deploy dei manifest (sostituisci il placeholder dell'immagine)
 sed "s|IMAGE_PLACEHOLDER|$IMG|" k8s/02-deployment.yaml | kubectl apply -f -
+# HTTPS: hostname nip.io dell'IP statico, scritto dal Terraform nel secret app-hostname
+# (non leggerlo dallo stato dell'Ingress: subito dopo l'apply puo' essere l'IP vecchio)
+APP_HOST=$(gcloud secrets versions access latest --secret=app-hostname)
+sed "s|HOST_PLACEHOLDER|$APP_HOST|" k8s/04-tls.yaml | kubectl apply -f -
 kubectl apply -f k8s/03-service-ingress.yaml    # aggancia l'IP statico wiz-tasky-ip
-# HTTPS: leggi l'IP dallo stato dell'Ingress e crea il certificato nip.io
-LB_IP=$(kubectl get ingress tasky -n tasky -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-sed "s|HOST_PLACEHOLDER|${LB_IP//./-}.nip.io|" k8s/04-tls.yaml | kubectl apply -f -
 kubectl rollout status deployment/tasky -n tasky --timeout=300s
-echo "App URL: https://${LB_IP//./-}.nip.io"
+echo "App URL: https://$APP_HOST"
 ```
 **Spiegazione (passi non ovvi):**
 - `apply` bootstrap = ricrea API, bucket state, WIF e SA; serve **prima** di tutto il resto.

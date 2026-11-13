@@ -49,7 +49,8 @@ Principi comuni a tutti i workflow:
 **Job `deploy`** (122-174): solo su main, `environment: production` (seconda approvazione). Si autentica (SA app), prende le credenziali del cluster, poi:
 - **Namespace e RBAC** (148-149): applica `00-namespace.yaml` + `01-rbac.yaml` (crea la SA `tasky` e il binding cluster-admin).
 - **Secret K8s** (151-160): legge `mongodb-uri` e `app-jwt-secret` da **Secret Manager**, li maschera nei log (`::add-mask::`) e crea il Secret `tasky-secrets` con `apply` idempotente. I segreti **non sono mai nel repo**.
-- **Deploy**: `sed` sostituisce `IMAGE_PLACEHOLDER` con l'immagine buildata e applica Deployment + Service/Ingress (l'Ingress aggancia l'IP statico `wiz-tasky-ip` per nome). Poi **legge l'IP dallo stato dell'Ingress** (`kubectl … jsonpath='{.status.loadBalancer.ingress[0].ip}'`, con attesa fino a ~10 min) — **nessun permesso Compute**, l'app SA resta least-privilege — costruisce l'hostname `nip.io`, lo inietta in `04-tls.yaml` (`HOST_PLACEHOLDER`) e crea il **ManagedCertificate**; attende il `rollout status`.
+- **Deploy**: `sed` sostituisce `IMAGE_PLACEHOLDER` con l'immagine buildata e applica il Deployment. Poi legge l'**hostname HTTPS** dal secret **`app-hostname`** (`gcloud secrets versions access`), che il Terraform calcola dall'**IP statico** `wiz-tasky-ip` (`<IP-con-trattini>.nip.io`); lo inietta in `04-tls.yaml` (`HOST_PLACEHOLDER`), crea il **ManagedCertificate** e applica Service/Ingress (l'Ingress aggancia l'IP statico per nome); attende il `rollout status`. L'app SA usa solo il ruolo `secretAccessor` che ha già: **nessun permesso Compute**.
+  - *Perché non si legge l'IP dall'Ingress:* subito dopo l'apply lo stato dell'Ingress può mostrare ancora l'IP precedente. Il certificato verrebbe chiesto per un dominio che non punta al LB e resterebbe bloccato in `Provisioning` (`FailedNotVisible`). È successo al primo deploy HTTPS; il secret elimina la race.
 - **Verifica**: mostra pod/svc/ingress, lo stato del `managedcertificate` (`Provisioning`→`Active`), stampa l'URL HTTPS e rilegge `wizexercise.txt` dal pod in esecuzione.
 
 > **Metodo di deploy del container: push-based via GitHub Actions** (`kubectl apply`), **non** ArgoCD né FluxCD. Vedi `docs/comandi.md` §Deploy per la spiegazione completa.
@@ -179,7 +180,7 @@ Nella console compaiono vari bucket: sono in un'**org condivisa** (CloudLabs), q
 
 ## B7. `secrets.tf`
 - Tre `random_password` (admin, app, jwt).
-- `locals.secrets`: le 3 password + la **connection string** `mongodb-uri` costruita con l'IP interno statico.
+- `locals.secrets`: le 3 password + la **connection string** `mongodb-uri` costruita con l'IP interno statico + **`app-hostname`** (`<IP-statico-LB-con-trattini>.nip.io`, non è un segreto: sta qui perché la pipeline app lo legge con il ruolo che ha già).
 - **Secret Manager**: `user_managed` replication fissata su `europe-west1` (l'org policy del lab **vieta `global`**); una secret-version per valore. *I valori finiscono nello state → per questo lo state è in un bucket privato.*
 
 ## B8. `gke.tf`
