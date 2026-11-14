@@ -46,7 +46,6 @@ bucket pubblico, cluster-admin, VM obsoleta).
 | `.github/workflows/app.yml` | Pipeline 2: build → verifica file → Hadolint → Trivy → ClamAV → push → deploy |
 | `.github/workflows/security.yml` | CodeQL + TruffleHog |
 | `.github/workflows/pipeline-security.yml` | Controlli sui workflow: actionlint, zizmor, segreti nei YAML |
-| `docs/demo.md` | Script della demo live |
 
 ## Debolezze intenzionali
 
@@ -79,8 +78,8 @@ bucket pubblico, cluster-admin, VM obsoleta).
 - *Detective*: 6 alert Cloud Monitoring basati sugli audit log (bucket reso pubblico, firewall aperto a internet, modifiche IAM, chiavi SA, `kubectl exec`, immagine bloccata)
 - *Rilevamento cloud (attivi)*:
   - **Security Command Center** (Standard): rileva da solo bucket pubblico, SSH aperto, VM con SA privilegiata, privilege escalation GKE (cluster-admin), CVE delle immagini
-  - **Cloud Armor**: WAF OWASP (SQLi, XSS, LFI, RCE, scanner detection) sul Load Balancer dell'app, in **preview mode** (non bloccante): logga cosa bloccherebbe senza interrompere l'esposizione intenzionale. Comandi e note in `docs/cloud-armor-dlp.md`
-  - **Sensitive Data Protection (DLP)**: inspection sul bucket di backup per qualificare la sensibilità dei dati (toxic combination "bucket pubblico + dati sensibili"); limiti sul formato binario dei dump in `docs/cloud-armor-dlp.md`
+  - **Cloud Armor**: WAF OWASP (SQLi, XSS, LFI, RCE, scanner detection) sul Load Balancer dell'app, in **preview mode** (non bloccante): logga cosa bloccherebbe senza interrompere l'esposizione intenzionale.
+  - **Sensitive Data Protection (DLP)**: inspection sul bucket di backup per qualificare la sensibilità dei dati (toxic combination "bucket pubblico + dati sensibili"). Cloud Armor e DLP sono configurati da console, fuori dal Terraform
 
 ---
 
