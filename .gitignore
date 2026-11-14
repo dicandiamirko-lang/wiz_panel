@@ -19,5 +19,5 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Documentazione esportata (solo locale, non va sul repo)
-docs/export/
+# Documentazione e materiale di studio (solo locale, non va sul repo)
+docs/
