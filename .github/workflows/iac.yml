@@ -23,18 +23,23 @@ on:
 
 permissions: {} # nessun permesso di default: ogni job dichiara i suoi
 
+# Un solo run Terraform alla volta (stesso "group"): evita due apply in parallelo
+# che corromperebbero il lock sullo state. cancel-in-progress=false: non annulla
+# un apply gia' in corso, lo lascia finire.
 concurrency:
   group: terraform
   cancel-in-progress: false
 
+# Le variabili TF_VAR_* sono lette in automatico da Terraform come var di input.
+# I valori arrivano dalle Variables del repo (prodotte dal bootstrap).
 env:
-  TF_IN_AUTOMATION: "true"
+  TF_IN_AUTOMATION: "true" # Terraform riduce l'output interattivo
   TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID }}
   TF_VAR_region: ${{ vars.GCP_REGION }}
   TF_VAR_zone: ${{ vars.GCP_ZONE }}
   TF_VAR_alert_email: ${{ vars.ALERT_EMAIL }}
   TF_VAR_enable_org_policies: ${{ vars.ENABLE_ORG_POLICIES || 'false' }}
-  TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+  TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }} # bucket dello state remoto
   WORKDIR: terraform
 
 jobs:
@@ -93,10 +98,10 @@ jobs:
 
       - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
 
-      - run: terraform fmt -check -recursive
-      - run: terraform init -input=false -backend-config="bucket=$TF_STATE_BUCKET"
-      - run: terraform validate
-      - run: terraform plan -input=false -out=tfplan
+      - run: terraform fmt -check -recursive # stile/formattazione: fallisce se non formattato
+      - run: terraform init -input=false -backend-config="bucket=$TF_STATE_BUCKET" # collega lo state remoto
+      - run: terraform validate # correttezza sintattica e dei riferimenti
+      - run: terraform plan -input=false -out=tfplan # calcola le modifiche e salva il piano
 
       # Il piano contiene i valori dei segreti: va nel bucket privato dello
       # state, non negli artifact di GitHub (scaricabili su un repo pubblico).
@@ -104,6 +109,9 @@ jobs:
         if: github.event_name != 'pull_request'
         run: gcloud storage cp tfplan "gs://$TF_STATE_BUCKET/plans/$GITHUB_RUN_ID/tfplan"
 
+  # APPLY: solo su main (push o run manuale "apply"), dopo "plan". L'environment
+  # "production" impone l'APPROVAZIONE MANUALE (required reviewers) prima di toccare
+  # l'infrastruttura. Applica ESATTAMENTE il piano salvato, non un ricalcolo.
   apply:
     name: Terraform apply
     needs: plan
@@ -141,6 +149,9 @@ jobs:
         run: gcloud storage rm "gs://$TF_STATE_BUCKET/plans/$GITHUB_RUN_ID/tfplan"
       - run: terraform output
 
+  # DESTROY: solo da avvio manuale con action="destroy". Prima di terraform
+  # destroy cancella il namespace e aspetta che Kubernetes rimuova Load Balancer
+  # e NEG (vedi sotto), altrimenti la VPC risulta "in uso" e il destroy fallisce.
   destroy:
     name: Terraform destroy
     needs: iac-scan

@@ -1,21 +1,25 @@
 # =============================================================================
-# Pipeline 2 - Applicazione
-#   build immagine -> verifica wizexercise.txt -> lint Dockerfile -> scan Trivy
-#   -> scan malware ClamAV
-#   -> push su Artifact Registry -> deploy su GKE
+# Pipeline 2 - Applicazione (build & deploy dell'immagine Tasky)
+#   lint Dockerfile -> build immagine -> verifica wizexercise.txt -> scan Trivy
+#   -> scan malware ClamAV -> push su Artifact Registry -> deploy su GKE
+# Due job: "build" (gira sempre: PR e main) e "deploy" (SOLO su main, dopo build).
+# Su PR la pipeline si ferma dopo gli scan: non pubblica e non fa deploy.
 # =============================================================================
 name: App - Build & Deploy
 
+# Trigger: parte solo se tocchi il codice app, i manifest k8s o questo workflow.
 on:
   pull_request:
     paths: ["app/**", "k8s/**", ".github/workflows/app.yml"]
   push:
     branches: [main]
     paths: ["app/**", "k8s/**", ".github/workflows/app.yml"]
-  workflow_dispatch:
+  workflow_dispatch: # avvio manuale dalla tab Actions
 
-permissions: {} # nessun permesso di default: ogni job dichiara i suoi
+permissions: {} # nessun permesso di default: ogni job dichiara i suoi (minimo necessario)
 
+# Variabili condivise: progetto/regione/zona dalle Variables del repo, nome
+# immagine completo (su Artifact Registry) e tag locale usato per build/scan.
 env:
   PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
   REGION: ${{ vars.GCP_REGION }}
@@ -39,9 +43,12 @@ jobs:
         with:
           persist-credentials: false # il token non resta nella cartella del repo
 
+      # Calcola il tag dell'immagine = commit SHA (prime 12 cifre): ogni build e'
+      # tracciabile al commit esatto, niente tag mutabili tipo "latest".
       - id: meta
         run: echo "image=${IMAGE}:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
 
+      # Lint del Dockerfile: blocca se ci sono errori (best practice immagine).
       - name: Lint Dockerfile (Hadolint)
         uses: hadolint/hadolint-action@06be81baf89a55ffd0e24b8f04a4185738dd3387 # v3.5.0
         with:
@@ -52,6 +59,8 @@ jobs:
       - name: Build immagine
         run: docker build -t "$LOCAL_IMAGE" app
 
+      # Requisito dell'esercizio: il file wizexercise.txt DEVE essere dentro
+      # l'immagine. Se manca, il cat fallisce e la pipeline si ferma.
       - name: Verifica wizexercise.txt nell'immagine
         run: |
           docker run --rm --entrypoint cat "$LOCAL_IMAGE" /app/wizexercise.txt
@@ -103,6 +112,8 @@ jobs:
           { echo '### ClamAV'; echo '```'; tail -n 12 clamav.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           exit "$rc"
 
+      # Da qui si tocca GCP: SOLO su main (non su PR). Login keyless via OIDC/WIF,
+      # impersonando la SA della pipeline App (gh-app-deployer), senza chiavi.
       - name: Auth GCP
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
@@ -110,6 +121,7 @@ jobs:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_APP_SA }}
 
+      # Pubblica l'immagine (gia' scansionata) su Artifact Registry con il tag SHA.
       - name: Push su Artifact Registry
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         env:
@@ -119,6 +131,9 @@ jobs:
           docker tag "$LOCAL_IMAGE" "$IMAGE_REF"
           docker push "$IMAGE_REF"
 
+  # Job di DEPLOY: parte solo dopo "build", solo su main, ed e' legato
+  # all'environment "production" -> richiede l'APPROVAZIONE MANUALE configurata
+  # sull'environment prima di toccare il cluster.
   deploy:
     name: Deploy su GKE
     needs: build
@@ -126,7 +141,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
+      id-token: write # serve per il login OIDC a GCP
     environment: production
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -145,9 +160,14 @@ jobs:
           cluster_name: ${{ env.CLUSTER }}
           location: ${{ env.ZONE }}
 
+      # Crea il namespace e il RBAC, incluso il binding cluster-admin del pod
+      # (DEBOLEZZA INTENZIONALE, definita in k8s/01-rbac.yaml).
       - name: Namespace e RBAC
         run: kubectl apply -f k8s/00-namespace.yaml -f k8s/01-rbac.yaml
 
+      # Legge i segreti da Secret Manager e li inietta come Secret Kubernetes a
+      # runtime: le credenziali non sono MAI nel repo ne' nell'immagine.
+      # ::add-mask:: evita che finiscano in chiaro nei log della run.
       - name: Secret K8s da Secret Manager
         run: |
           MONGODB_URI=$(gcloud secrets versions access latest --secret=mongodb-uri)
