@@ -78,7 +78,23 @@ resource "google_container_cluster" "gke" {
     http_load_balancing {
       disabled = false # serve l'addon per far creare all'Ingress il Google Cloud Load Balancer
     }
+    network_policy_config {
+      disabled = false # addon necessario per applicare le NetworkPolicy (vedi sotto)
+    }
   }
+
+  # Network Policy (Calico): abilita l'enforcement delle NetworkPolicy Kubernetes,
+  # cioe' la micro-segmentazione tra pod. Senza, un pod compromesso raggiunge tutti
+  # gli altri. Finche' non si crea una NetworkPolicy il traffico resta tutto permesso.
+  # (Calico invece di Dataplane V2: quest'ultimo richiederebbe di ricreare il cluster.)
+  network_policy {
+    enabled  = true
+    provider = "CALICO"
+  }
+
+  # Intranode visibility: il traffico tra pod sullo STESSO nodo passa dalla VPC,
+  # quindi compare nei VPC Flow Logs e rispetta il firewall (visibilita'/forensics).
+  enable_intranode_visibility = true
 
   # Binary Authorization (opzionale): se attivo, il cluster applica la policy che
   # ammette solo immagini dal nostro Artifact Registry (vedi security.tf).

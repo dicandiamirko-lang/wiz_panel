@@ -14,10 +14,19 @@ resource "google_compute_network" "vpc" {
 
 # Subnet PUBBLICA: ospita la VM MongoDB. E' qui che vive la superficie esposta.
 resource "google_compute_subnetwork" "public" {
-  name          = "${var.name_prefix}-public"
-  region        = var.region
-  network       = google_compute_network.vpc.id
-  ip_cidr_range = "10.10.1.0/24"
+  name                     = "${var.name_prefix}-public"
+  region                   = var.region
+  network                  = google_compute_network.vpc.id
+  ip_cidr_range            = "10.10.1.0/24"
+  private_ip_google_access = true # la VM raggiunge le API Google (Secret Manager, GCS) sulla rete Google
+
+  # VPC Flow Logs anche qui: e' la subnet ESPOSTA, quella dove servono di piu'
+  # (chi si connette alla 22, verso dove esce il traffico della VM).
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
 # Subnet PRIVATA: ospita i nodi GKE.

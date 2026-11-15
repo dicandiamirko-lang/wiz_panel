@@ -92,6 +92,17 @@ resource "google_compute_instance" "mongo" {
     }
   }
 
+  # Shielded VM: Secure Boot + vTPM + integrity monitoring. Difende dal boot di
+  # codice non firmato / rootkit (stesso controllo gia' attivo sui nodi GKE).
+  # Non tocca le debolezze volute: OS e MongoDB restano obsoleti, SSH resta aperto.
+  # Attivarlo su una VM esistente richiede uno stop/start (allow_stopping_for_update);
+  # lo startup script e' idempotente (MARKER) quindi il riavvio non reinstalla nulla.
+  shielded_instance_config {
+    enable_secure_boot          = true
+    enable_vtpm                 = true
+    enable_integrity_monitoring = true
+  }
+
   # Identita' della VM. scopes=cloud-platform insieme ai ruoli IAM sopra e' cio'
   # che rende la SA realmente sfruttabile per l'escalation.
   service_account {

@@ -23,6 +23,46 @@ resource "google_storage_bucket" "backups" {
       type = "Delete"
     }
   }
+
+  # Usage/access logs: registra OGNI richiesta al bucket (IP, oggetto, esito),
+  # incluse quelle ANONIME. E' il controllo detective che serve qui: i Data Access
+  # audit log non registrano gli accessi pubblici (allUsers), gli usage log si'.
+  # Il bucket resta pubblico (debolezza voluta), ma ora si vede chi scarica i dump.
+  logging {
+    log_bucket        = google_storage_bucket.access_logs.name
+    log_object_prefix = "mongo-backups/"
+  }
+}
+
+# Bucket PRIVATO che riceve gli usage log del bucket dei backup.
+resource "google_storage_bucket" "access_logs" {
+  name                        = "${var.project_id}-access-logs"
+  location                    = var.region
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced" # nessun accesso pubblico ai log
+  force_destroy               = true
+
+  versioning {
+    enabled = true # protegge i log da sovrascritture/cancellazioni accidentali
+  }
+
+  # Conserva i log 90 giorni (come gli audit log), poi li elimina.
+  lifecycle_rule {
+    condition {
+      age = 90
+    }
+    action {
+      type = "Delete"
+    }
+  }
+}
+
+# Google scrive gli usage log tramite il gruppo di servizio cloud-storage-analytics:
+# gli serve solo il permesso di creare oggetti nel bucket dei log.
+resource "google_storage_bucket_iam_member" "access_logs_writer" {
+  bucket = google_storage_bucket.access_logs.name
+  role   = "roles/storage.objectCreator"
+  member = "group:cloud-storage-analytics@google.com"
 }
 
 # LA riga che rende il bucket pubblico: allUsers (chiunque su internet) con il
