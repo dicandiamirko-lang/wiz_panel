@@ -95,6 +95,42 @@ resource "google_storage_bucket" "tfstate" {
   versioning {
     enabled = true
   }
+
+  # Access log: registra chi legge/scrive lo state (che contiene segreti).
+  logging {
+    log_bucket        = google_storage_bucket.tfstate_logs.name
+    log_object_prefix = "tfstate/"
+  }
+}
+
+# Bucket PRIVATO che riceve gli access log del bucket di state. Sta nel bootstrap
+# (e non nel Terraform principale) perche' deve esistere prima dello state stesso.
+resource "google_storage_bucket" "tfstate_logs" {
+  name                        = "${var.project_id}-wiz-tfstate-logs"
+  location                    = var.region
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+  force_destroy               = true
+
+  versioning {
+    enabled = true
+  }
+
+  lifecycle_rule {
+    condition {
+      age = 90 # stessa retention degli audit log
+    }
+    action {
+      type = "Delete"
+    }
+  }
+}
+
+# Google scrive gli access log tramite il gruppo cloud-storage-analytics.
+resource "google_storage_bucket_iam_member" "tfstate_logs_writer" {
+  bucket = google_storage_bucket.tfstate_logs.name
+  role   = "roles/storage.objectCreator"
+  member = "group:cloud-storage-analytics@google.com"
 }
 
 # --- Workload Identity Federation per GitHub Actions ---------------------------
