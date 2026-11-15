@@ -26,6 +26,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false # il token non resta nella cartella del repo
+      # init: prepara il motore CodeQL per Go. autobuild: compila l'app (CodeQL
+      # analizza il codice compilato). analyze: esegue le query SAST e carica i
+      # risultati nella tab Security (Code scanning).
       - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
         with:
           languages: go

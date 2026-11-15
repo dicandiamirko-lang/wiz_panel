@@ -1,21 +1,29 @@
+# =============================================================================
+# Variabili di input della configurazione principale.
+# I valori reali arrivano dalla pipeline (TF_VAR_*) o da terraform.tfvars.
+# =============================================================================
+
 variable "project_id" {
   description = "ID del progetto GCP (Wiz CloudLabs)"
   type        = string
 }
 
 variable "region" {
-  type    = string
-  default = "europe-west1"
+  description = "Regione delle risorse regionali (subnet, bucket, VM). Vincolata a europe-west1 dalle org policy del lab."
+  type        = string
+  default     = "europe-west1"
 }
 
 variable "zone" {
-  type    = string
-  default = "europe-west1-b"
+  description = "Zona per le risorse zonali (VM, cluster GKE zonale)."
+  type        = string
+  default     = "europe-west1-b"
 }
 
 variable "name_prefix" {
-  type    = string
-  default = "wiz"
+  description = "Prefisso applicato ai nomi delle risorse (es. wiz-vpc, wiz-gke)."
+  type        = string
+  default     = "wiz"
 }
 
 # --- VM MongoDB -----------------------------------------------------------------
@@ -32,23 +40,26 @@ variable "mongo_version" {
 }
 
 variable "mongo_vm_machine_type" {
-  type    = string
-  default = "e2-medium"
+  description = "Tipo macchina della VM MongoDB (dimensionamento/costo)."
+  type        = string
+  default     = "e2-medium"
 }
 
 # --- GKE ------------------------------------------------------------------------
 variable "gke_node_machine_type" {
-  type    = string
-  default = "e2-standard-2"
+  description = "Tipo macchina dei nodi GKE."
+  type        = string
+  default     = "e2-standard-2"
 }
 
 variable "gke_node_count" {
-  type    = number
-  default = 2
+  description = "Numero di nodi nel node pool di default."
+  type        = number
+  default     = 2
 }
 
 variable "gke_master_authorized_cidr" {
-  description = "CIDR autorizzato a raggiungere l'API server GKE. 0.0.0.0/0 perche' i runner GitHub hostati hanno IP dinamici."
+  description = "CIDR autorizzato a raggiungere l'API server GKE. 0.0.0.0/0 perche' i runner GitHub hostati hanno IP dinamici (debolezza voluta: in prod va ristretto)."
   type        = string
   default     = "0.0.0.0/0"
 }
