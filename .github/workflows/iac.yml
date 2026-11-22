@@ -58,7 +58,7 @@ jobs:
       # pipeline le rileva e le pubblica senza bloccare. In un contesto reale
       # si imposta soft_fail: false per bloccare il deploy.
       - name: Checkov
-        uses: bridgecrewio/checkov-action@45edc9d8856b664db2ec251f5f8632361f0a67aa # v12
+        uses: bridgecrewio/checkov-action@3f0caf0c3aa9f56ade6b49f6e60b63aaeafb75a3 # v12
         with:
           directory: . # dalla radice: i percorsi nel SARIF corrispondono ai file del repo
           framework: terraform
