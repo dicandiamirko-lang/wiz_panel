@@ -10,7 +10,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 6.0" # provider ufficiale Google Cloud
+      version = "~> 8.11" # provider ufficiale Google Cloud
     }
     random = {
       source  = "hashicorp/random"
